@@ -10,6 +10,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -18,37 +19,44 @@ import android.widget.ArrayAdapter;
 
 import com.br.mtgcardmanager.Adapter.PagerAdapter;
 import com.br.mtgcardmanager.Helper.DatabaseHelper;
+import com.br.mtgcardmanager.Model.APICard;
+import com.br.mtgcardmanager.Network.GetDataService;
+import com.br.mtgcardmanager.Network.RetrofitClientInstance;
 import com.br.mtgcardmanager.R;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.common.api.GoogleApiClient;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 
 
 //public class MainActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,
 //        GoogleApiClient.OnConnectionFailedListener { //com drive api
 public class MainActivity extends AppCompatActivity { //sem drive api
 
-    FragmentSearch fragmentSearch;
-    DatabaseHelper                dbHelper;
-    ViewPager                     viewPager;
-    ArrayList<String>             jsonCardsList;
-    String                        json;
-    MenuItem                      searchItem;
-    private AdView                mAdView;
+    private       FragmentSearch                fragmentSearch;
+    private       DatabaseHelper                dbHelper;
+    private       ViewPager                     viewPager;
+    private       List<String>                  jsonCardsList = new ArrayList<>();
+    private       MenuItem                      searchMenu;
+    private       AdView                        mAdView;
+    public static GoogleApiClient               mGoogleApiClient;
+    public static boolean                       running = false;
+    private       SearchView.SearchAutoComplete searchAutoComplete;
+    private       Call<APICard>                 call = null;
+    private       ArrayAdapter<String>          adapter = null;
+    private       SearchView                    searchView = null;
 //    private static final String   TAG = "MainActivity";
 //    private static final String   DRIVE_TAG = "Google Drive Activity";
 //    private static final int      REQUEST_CODE_RESOLUTION = 1;
-    public static GoogleApiClient mGoogleApiClient;
-    public static boolean         running = false;
+
 
 
     @Override
@@ -86,9 +94,6 @@ public class MainActivity extends AppCompatActivity { //sem drive api
             dbHelper.insertAllEditions();
         }
 
-        // Get the JSON containing all printed cards
-//        getCardsFromJSON();
-
         TabLayout tabLayout = findViewById(R.id.tab_layout_id);
         tabLayout.addTab(tabLayout.newTab().setText(getString(R.string.fragment_have_name)));
         tabLayout.addTab(tabLayout.newTab().setText(getString(R.string.fragment_search_name)));
@@ -104,17 +109,13 @@ public class MainActivity extends AppCompatActivity { //sem drive api
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 viewPager.setCurrentItem(tab.getPosition());
-            }//end onTabSelected
+            }
 
             @Override
-            public void onTabUnselected(TabLayout.Tab tab) {
-
-            }//end onTabUnselected
+            public void onTabUnselected(TabLayout.Tab tab) {}
 
             @Override
-            public void onTabReselected(TabLayout.Tab tab) {
-
-            }//end onTabReselected
+            public void onTabReselected(TabLayout.Tab tab) {}
         });
 
         // Set Tab Search as the initial tab
@@ -191,13 +192,10 @@ public class MainActivity extends AppCompatActivity { //sem drive api
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
 
-        searchItem = menu.findItem(R.id.search);
-        final SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
-        final SearchView.SearchAutoComplete searchAutoComplete = searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
+        searchMenu = menu.findItem(R.id.search);
+        searchView = (SearchView) MenuItemCompat.getActionView(searchMenu);
+        searchAutoComplete = searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
         searchAutoComplete.setTextColor(Color.WHITE);
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.auto_complete_dropdown, jsonCardsList);
-        searchAutoComplete.setAdapter(adapter);
         searchAutoComplete.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -211,13 +209,19 @@ public class MainActivity extends AppCompatActivity { //sem drive api
             public boolean onQueryTextSubmit(String query) {
                 searchCard(query);
                 return false;
-            }//end onQueryTextSubmit
+            }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                // User changed the text
-                return false;
-            }// end onQueryTextChange
+                System.out.println("onQueryTextChange: " + newText);
+                if (newText.length() > 2) {
+                    if (call != null && call.isExecuted()) {
+                        call.cancel();
+                    }
+                    apiSearchByName(newText);
+                }
+                return true;
+            }
         });
 
         SearchManager searchManager = (SearchManager) getSystemService(this.SEARCH_SERVICE);
@@ -233,7 +237,7 @@ public class MainActivity extends AppCompatActivity { //sem drive api
             Intent intent = new Intent(this, AboutActivity.class);
             startActivity(intent);
             return true;
-        }//end if
+        }
 
         return super.onOptionsItemSelected(item);
     }//end onOptionsItemSelected
@@ -241,7 +245,8 @@ public class MainActivity extends AppCompatActivity { //sem drive api
 
     public void searchCard(String query) {
         fragmentSearch = new FragmentSearch();
-        MenuItemCompat.collapseActionView(searchItem); //recolhe o campo de busca do menu
+        MenuItemCompat.collapseActionView(searchMenu); //recolhe o campo de busca do menu
+        searchAutoComplete.dismissDropDown();
 
         // If not in Tab Search, then go to Tab Search
         // 0 = Tab Have / 1 = Tab Search / 2 = Tab Want
@@ -250,46 +255,58 @@ public class MainActivity extends AppCompatActivity { //sem drive api
         }
 
         fragmentSearch.searchLigaMagic(MainActivity.this, query);
-    }
+    }// end searchCard
 
-    private String loadJSONFromAsset() {
-        json = null;
-        try {
-            InputStream is = this.getAssets().open("AllCards.json");
-            int size = is.available();
-            byte[] buffer = new byte[size];
 
-            is.read(buffer);
-            is.close();
-            json = new String(buffer, "UTF-8");
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            return null;
-        }
-        return json;
-    }
+    /**
+     * Search a list of cards from the API that have a certain name.
+     * @param name
+     */
+    private void apiSearchByName(String name) {
+        GetDataService service = RetrofitClientInstance.getRetrofitInstance().create(GetDataService.class);
+        call = service.getCardsByName(name, getString(R.string.pt_br), 10);
 
-    private ArrayList<String> getCardsFromJSON() {
-        try {
-            JSONObject obj = new JSONObject(loadJSONFromAsset());
-            JSONArray m_jArray = obj.names();
-//            Iterator iter = obj.keys();
-            jsonCardsList = new ArrayList();
+        call.enqueue(new Callback<APICard>() {
+            @Override
+            public void onResponse(Call<APICard> call, Response<APICard> response) {
+                List<APICard> returnedCards = new ArrayList<>();
+                jsonCardsList = new ArrayList<>();
+                int cardsQty;
 
-//            while (iter.hasNext()) {
-//                String key = iter.next().toString();
-//                Object value = obj.get(key);
-//                System.out.print(value);
-//            }
+                returnedCards.add(response.body());
+                APICard apiCard = returnedCards.get(0);
+                cardsQty = apiCard.getCards().length;
 
-            for (int i = 0; i < m_jArray.length(); i++) {
-                jsonCardsList.add(m_jArray.get(i).toString());
+                for (int i = 0; i < cardsQty; i++) {
+                    for (int y = 0; y < apiCard.getCards()[i].getForeignNames().length; y++) {
+                        if (apiCard.getCards()[i].getForeignNames()[y].getLanguage().equalsIgnoreCase("Portuguese (Brazil)")) {
+                            jsonCardsList.add(apiCard.getCards()[i].getForeignNames()[y].getName());
+                        }
+                    }
+                }
+
+                setAutoCompleteAdapter();
             }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return jsonCardsList;
-    }
+
+            @Override
+            public void onFailure(Call<APICard> call, Throwable t) {
+                if (call.isCanceled()) {
+                    Log.e("apiSearchByName","request cancelled");
+                } else {
+                    Log.e("apiSearchByName", t.toString());
+                }
+            }
+        });
+    }// end apiSearchByName
+
+    /**
+     * Set the adapter for the autocomplete and shows the dropdown list.
+     */
+    private void setAutoCompleteAdapter() {
+        adapter = new ArrayAdapter<>(this, R.layout.auto_complete_dropdown, jsonCardsList);
+        searchAutoComplete.setAdapter(adapter);
+        searchAutoComplete.showDropDown();
+    }// setAutoCompleteAdapter
 
 
     //daqui pra baixo é sem drive api

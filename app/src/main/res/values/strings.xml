@@ -22,6 +22,9 @@
     <string name="no">Não</string>
     <string name="foil">Foil</string>
     <string name="loading">Carregando…</string>
+    <string name="imageViewContentDescription">Card image</string>
+    <string name="prices">Preços</string>
+    <string name="pt_br">portuguese (brazil)</string>
 
     <!--MESSAGES-->
     <string name="search_failed">Falha na consulta. Tente novamente.</string>

@@ -33,8 +33,10 @@ public class HaveCards {
         this.foil       = foil;
     }
 
-    // getters and setters
 
+    /**
+     * GETTERS AND SETTERS
+     */
     public int getId() {
         return id;
     }

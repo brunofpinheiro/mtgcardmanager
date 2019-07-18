@@ -1,0 +1,57 @@
+<resources>
+    <!--APP NAME-->
+    <string name="app_name">MTG Card Manager</string>
+
+    <!--STRINGS-->
+    <string name="fragment_search_name">Consulta</string>
+    <string name="fragment_want_name">Quero</string>
+    <string name="fragment_have_name">Tenho</string>
+    <string name="hint_search">Nome da carta…</string>
+    <string name="min">Menor:</string>
+    <string name="avg">Médio:</string>
+    <string name="max">Maior:</string>
+    <string name="action_about">Sobre</string>
+    <string name="editions_dialog_title">EDIÇÕES</string>
+    <string name="search">Consultar</string>
+    <string name="delete">Deletar</string>
+    <string name="add_note">Criar lembrete</string>
+    <string name="notification_title">MTG Card Manager</string>
+    <string name="have_notification_text">Separar:</string>
+    <string name="want_notification_text">Pegar:</string>
+    <string name="yes">Sim</string>
+    <string name="no">Não</string>
+    <string name="foil">Foil</string>
+    <string name="loading">Carregando…</string>
+
+    <!--MESSAGES-->
+    <string name="search_failed">Falha na consulta. Tente novamente.</string>
+    <string name="no_cards">Nenhuma carta cadastrada</string>
+    <string name="one_card_inserted">1 Carta Adicionada</string>
+    <string name="four_cards_inserted">4 Cartas Adicionadas</string>
+    <string name="insert_failed">Ocorreu uma falha. Tente novamente.</string>
+    <string name="delete_confirmation">Tem certeza que quer deletar essa carta?</string>
+    <string name="delete_successful">Carta deletada</string>
+    <string name="edition_not_found">Desculpe, essa edição não está cadastrada.</string>
+    <string name="card_not_found">Carta não encontrada.</string>
+
+    <!--BUTTONS-->
+    <string name="btn_have_add">TENHO</string>
+    <string name="btn_want_add">QUERO</string>
+    
+    <!--TABLE HEADERS-->
+    <string name="header_name">Nome</string>
+    <string name="header_qty">Qtde</string>
+
+    <!--ABOUT ACTIVITY-->
+    <string name="welcome">Bem vindo!</string>
+    <string name="haveandwant">Tenho e Quero</string>
+    <string name="about_description1">"
+        Com o MTG Card Manager você poderá carregar sua coleção com você o tempo todo e facilitar as negociações com outros jogadores!
+
+        Acabou aquela história de deixar de negociar alguma carta porque você não lembra se tem ou deixar de comprar uma carta rara porque você não lembra se ela faz parte do deck que está montando.
+
+        Cadastre as cartas que você tem e as que você quer para levá-las sempre com você e não perca negócios mais!"</string>
+    <string name="about_search_description1">Basta começar a digitar o nome da carta (em inglês) e as sugestões aparecerão.</string>
+    <string name="about_search_description2">Na hora de cadastrar as cartas basta tocar e segurar os botões Tenho ou Quero para adicionar 4 unidades ou um toque simples para adicionar 1 unidade.</string>
+    <string name="about_search_description3">É possível consultar uma carta cadastrada facilmente, deletá-la e até criar um lembrete para ela. Toque e segure uma carta para exibir o menu de ações.</string>
+</resources>

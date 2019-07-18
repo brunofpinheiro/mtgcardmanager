@@ -33,8 +33,12 @@ public class WantCards {
         this.foil       = foil;
     }
 
-    // getters and setters
 
+
+    /**
+     * GETTERS AND SETTERS
+     * @return
+     */
     public int getId() {
         return id;
     }

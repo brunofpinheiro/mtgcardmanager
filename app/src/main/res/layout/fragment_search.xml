@@ -4,9 +4,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:scrollbars="none"
-    android:layout_weight="1" >
+    android:layout_weight="1"
+    android:background="@color/background">
 
-    <RelativeLayout xmlns:tools="http://schemas.android.com/tools"
+    <RelativeLayout
         android:id="@+id/relativeLayoutID"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -17,59 +18,95 @@
         android:paddingTop="@dimen/activity_vertical_margin"
         tools:context="com.br.mtgcardmanager.View.MainActivity">
 
-        <ImageView
-            android:id="@+id/ivCardImageID"
-            android:layout_width="300dp"
-            android:layout_height="350dp"
-            android:layout_centerHorizontal="true"/>
-
         <TextView
             android:id="@+id/cardNameID"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/ivCardImageID"
             android:gravity="center_horizontal"
+            android:textColor="@color/textPrimary"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/cardNameEN"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/cardNameID"
+            android:gravity="center_horizontal"
+            android:textColor="@color/textSecondary"
+            android:textSize="16sp"
+            android:textStyle="italic" />
+
+        <ImageView
+            android:id="@+id/ivCardImageID"
+            android:layout_width="220dp"
+            android:layout_height="275dp"
+            android:layout_alignLeft="@id/btn_tenho"
+            android:layout_below="@id/cardNameEN"
+            android:layout_marginTop="25dp"
+            android:contentDescription="@string/imageViewContentDescription"
+            android:scaleType="fitStart" />
+
+        <TextView
+            android:id="@+id/tvPrices"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/ivCardImageID"
+            android:layout_alignTop="@id/ivCardImageID"
+            android:layout_marginTop="70dp"
+            android:text="@string/prices"
+            android:textColor="@color/colorPrimary"
+            android:textSize="20sp"
             android:textStyle="bold"
-            android:textColor="@android:color/black" />
+            android:visibility="invisible" />
+
+        <TextView
+            android:id="@+id/tvMinPrice"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tvPrices"
+            android:layout_alignLeft="@id/tvPrices"
+            android:layout_marginTop="10dp"
+            android:textColor="@color/textPrimary"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:visibility="invisible" />
+
+        <TextView
+            android:id="@+id/tvMaxPrice"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tvMinPrice"
+            android:layout_alignLeft="@id/tvMinPrice"
+            android:textColor="@color/textSecondary"
+            android:textSize="18sp"
+            android:visibility="invisible" />
 
         <Button
             android:id="@+id/btn_tenho"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_below="@+id/ivCardImageID"
+            android:layout_marginTop="30dp"
+            android:minHeight="35dip"
+            android:background="@color/colorPrimary"
             android:text="@string/btn_have_add"
-            android:layout_below="@+id/cardNameID"
-            android:layout_toLeftOf="@+id/dummy"
-            android:textColor="@color/black"
-            android:drawableLeft="@drawable/ic_add_green_24dp"
+            android:textColor="@color/textPrimary"
+            android:textSize="18sp"
             android:visibility="invisible" />
-
-        <View
-            android:id="@+id/dummy"
-            android:visibility="visible"
-            android:layout_height="0dip"
-            android:layout_width="1dip"
-            android:layout_below="@+id/cardNameID"
-            android:layout_centerHorizontal="true"/>
 
         <Button
             android:id="@+id/btn_quero"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_below="@+id/btn_tenho"
+            android:layout_marginTop="10dp"
+            android:minHeight="35dip"
+            android:background="@color/colorPrimary"
             android:text="@string/btn_want_add"
-            android:layout_below="@+id/cardNameID"
-            android:layout_toRightOf="@id/dummy"
-            android:textColor="@color/black"
-            android:drawableLeft="@drawable/ic_add_green_24dp"
-            android:visibility="invisible"/>
-
-        <TableLayout
-            android:id="@+id/tableLayoutID"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/btn_tenho"
-            android:layout_centerHorizontal="true"
-            android:padding="15dip"
-            android:isScrollContainer="true"/>
+            android:textColor="@color/textPrimary"
+            android:textSize="18sp"
+            android:visibility="invisible" />
 
     </RelativeLayout>
 </ScrollView>

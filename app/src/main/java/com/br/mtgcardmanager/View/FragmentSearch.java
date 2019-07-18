@@ -4,8 +4,6 @@ package com.br.mtgcardmanager.View;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
-import android.graphics.Color;
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -17,8 +15,6 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.TableLayout;
-import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -135,14 +131,16 @@ public class FragmentSearch extends Fragment implements View.OnClickListener, Ad
      * @param query
      */
     public void searchLigaMagic(final Activity activity, final String query) {
-        TableLayout tableLayout    = activity.findViewById(R.id.tableLayoutID);
-        final ImageView mCardImage = activity.findViewById(R.id.ivCardImageID);
-        final TextView mCardName   = activity.findViewById(R.id.cardNameID);
+//        TableLayout     tableLayout = activity.findViewById(R.id.tableLayoutID);
+        final ImageView mCardImage  = activity.findViewById(R.id.ivCardImageID);
+        final TextView  mCardNamePT = activity.findViewById(R.id.cardNameID);
+        final TextView  mCardNameEN = activity.findViewById(R.id.cardNameEN);
 
-        tableLayout.removeAllViews();
+//        tableLayout.removeAllViews();
         progressDialog = new ProgressDialog(activity, R.style.progressDialog);
+//        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progressDialog.setCancelable(false);
         progressDialog = ProgressDialog.show(activity, "", activity.getString(R.string.loading), true);
-        progressDialog.setCancelable(true);
 
         queue        = Volley.newRequestQueue(activity.getApplicationContext());
         searchedCard = query.replace(" ", "+");
@@ -172,7 +170,7 @@ public class FragmentSearch extends Fragment implements View.OnClickListener, Ad
                                                 Toast.makeText(activity.getApplicationContext(), activity.getString(R.string.card_not_found), Toast.LENGTH_LONG).show();
                                             } else {
                                                 if (secondRequest) {
-                                                    montarLayout(activity, mCardImage, mCardName);
+                                                    montarLayout(activity, mCardImage, mCardNamePT, mCardNameEN);
                                                 }
                                             }
                                             //end if
@@ -187,7 +185,7 @@ public class FragmentSearch extends Fragment implements View.OnClickListener, Ad
                             queue.add(stringRequest);
                         }//end if
                         if (!secondRequest) {
-                            montarLayout(activity, mCardImage, mCardName);
+                            montarLayout(activity, mCardImage, mCardNamePT, mCardNameEN);
                         }//end if
                     }//end onResponse
                 }, new Response.ErrorListener() {
@@ -204,25 +202,34 @@ public class FragmentSearch extends Fragment implements View.OnClickListener, Ad
 
     /**
      * Gets the screen components and builds the layout.
-     *
-     * @param activity the activity
-     * @param mCardImage the image view
-     * @param mCardName the text view
+     * @param activity
+     * @param mCardImage
+     * @param mCardNamePT
+     * @param mCardNameEN
      */
-    public void montarLayout(Activity activity, ImageView mCardImage, TextView mCardName){
-        Button   btnHaveAdd;
-        Button   btnWantAdd;
+    public void montarLayout(Activity activity, ImageView mCardImage, TextView mCardNamePT, TextView mCardNameEN){
+        Button   mBtnHaveAdd;
+        Button   mBtnWantAdd;
+        TextView mTvPrices;
+        TextView mTvMinPrice;
+        TextView mTvMaxPrice;
         Elements imgSpan;
         String   cardImgURL;
-        String   cardNameFull;
-        Elements hmtlUl;
-        Elements htmlLi;
+//        String   cardNameFull;
+//        Elements hmtlUl;
+//        Elements htmlLi;
 
-        // Show buttons Want and Have
-        btnHaveAdd = activity.findViewById(R.id.btn_tenho);
-        btnWantAdd = activity.findViewById(R.id.btn_quero);
-        btnHaveAdd.setVisibility(View.VISIBLE);
-        btnWantAdd.setVisibility(View.VISIBLE);
+        mBtnHaveAdd = activity.findViewById(R.id.btn_tenho);
+        mBtnWantAdd = activity.findViewById(R.id.btn_quero);
+        mTvPrices   = activity.findViewById(R.id.tvPrices);
+        mTvMinPrice = activity.findViewById(R.id.tvMinPrice);
+        mTvMaxPrice = activity.findViewById(R.id.tvMaxPrice);
+
+        mBtnHaveAdd.setVisibility(View.VISIBLE);
+        mBtnWantAdd.setVisibility(View.VISIBLE);
+        mTvPrices.setVisibility(View.VISIBLE);
+        mTvMinPrice.setVisibility(View.VISIBLE);
+        mTvMaxPrice.setVisibility(View.VISIBLE);
 
         imgSpan    = doc.select("div[id=card-image-src]");
         cardImgURL = "https:" + imgSpan.select("img").attr("src");
@@ -235,28 +242,40 @@ public class FragmentSearch extends Fragment implements View.OnClickListener, Ad
         cardNamePT = doc.select("div[id=card-sm-name]").select("p[class=nome-principal]");
         cardNameEN = doc.select("div[id=card-sm-name]").select("p[class=nome-auxiliar]");
 
-        if (cardNameEN.size() > 0)
-            cardNameFull = cardNamePT.get(0).text() + " | " + cardNameEN.get(0).text();
-        else
-            cardNameFull = cardNamePT.get(0).text();
-        mCardName.setText(cardNameFull);
+//        if (cardNameEN.size() > 0)
+//            cardNameFull = cardNamePT.get(0).text() + " | " + cardNameEN.get(0).text();
+//        else
+//            cardNameFull = cardNamePT.get(0).text();
+        mCardNamePT.setText(cardNamePT.get(0).text());
+        mCardNameEN.setText(cardNameEN.get(0).text());
 
-        TableLayout layout = activity.findViewById(R.id.tableLayoutID);
-        TableLayout.LayoutParams tableParams = new TableLayout.LayoutParams(
-                TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.MATCH_PARENT);
-        TableRow.LayoutParams rowParams = new TableRow.LayoutParams(
-                TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
-        TableLayout tblLayout = new TableLayout(activity.getApplicationContext());
-        tblLayout.setLayoutParams(tableParams);
+//        TableLayout layout = activity.findViewById(R.id.tableLayoutID);
+//        TableLayout.LayoutParams tableParams = new TableLayout.LayoutParams(
+//                TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.MATCH_PARENT);
+//        TableRow.LayoutParams rowParams = new TableRow.LayoutParams(
+//                TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
+//        TableLayout tblLayout = new TableLayout(activity.getApplicationContext());
+//        tblLayout.setLayoutParams(tableParams);
+
+//        TableRow rowPrices = new TableRow(activity.getApplicationContext());
+//        rowPrices.setLayoutParams(rowParams);
+//        TextView textViewPrices = new TextView(activity.getApplicationContext());
+//        textViewPrices.setTextSize(18);
+//        textViewPrices.setTextColor(activity.getResources().getColor(R.color.colorPrimary));
+////        textViewPrices.setText(getString(R.string.prices));
+//        textViewPrices.setText("Precos");
+//        textViewPrices.setTypeface(null, Typeface.BOLD);
+//        rowPrices.addView(textViewPrices);
+//        layout.addView(rowPrices);
 
 //        hmtlUl = doc.select("div[class=bloco-edicoes]");
 //        htmlLi = hmtlUl.select("li");
 
-        Elements htmlEditionsNames = doc.select("div[id=card-filtros]").select("div:last-child[class=filtro]").select("div[class=filtro-opcao]");
+        Elements htmlEditionsNames = doc.select("div[id=card-filtros]")
+                .select("div:last-child[class=filtro]").select("div[class=filtro-opcao]");
 
 //        for (int i = 0; i < htmlLi.size(); i++) {
         for (int i = 0; i < htmlEditionsNames.size(); i++) {
-            //TODO: Igualar o tamanho do icone em todas as resolucoes
             ImageView mImageView = new ImageView(activity.getApplicationContext());
             mImageView.setAdjustViewBounds(true);
 
@@ -314,26 +333,31 @@ public class FragmentSearch extends Fragment implements View.OnClickListener, Ad
         String menorPreco = htmlDivPrecos.select("div[class=col-xl-6 col-6 b preco-menor]").select("font[class=bigger]").html();
         String maiorPreco = htmlDivPrecos.select("div[class=col-xl-6 col-6 b preco-maior]").select("font[class=bigger]").html();
 
-        TableRow row = new TableRow(activity.getApplicationContext());
-        row.setLayoutParams(rowParams);
-        TextView textView = new TextView(activity.getApplicationContext());
-        textView.setTextSize(14);
-        textView.setTextColor(Color.BLACK);
+        mTvMinPrice.setText(activity.getResources().getString(R.string.min) + " R$ " + menorPreco);
+        mTvMinPrice.setTextSize(16);
+        mTvMaxPrice.setText(activity.getResources().getString(R.string.max) + " R$ " + maiorPreco);
+        mTvMaxPrice.setTextSize(16);
 
-        textView.setText(activity.getString(R.string.min) + " " + menorPreco);
-        textView.setTypeface(null, Typeface.BOLD);
-        row.addView(textView);
-        layout.addView(row);
-
-        row = new TableRow(activity.getApplicationContext());
-        row.setLayoutParams(rowParams);
-        textView = new TextView(activity.getApplicationContext());
-        textView.setTextSize(14);
-        textView.setTextColor(Color.BLACK);
-
-        textView.setText(activity.getString(R.string.max) + " " + maiorPreco);
-        row.addView(textView);
-        layout.addView(row);
+//        TableRow row = new TableRow(activity.getApplicationContext());
+//        row.setLayoutParams(rowParams);
+//        TextView textView = new TextView(activity.getApplicationContext());
+//        textView.setTextSize(14);
+//        textView.setTextColor(Color.BLACK);
+//
+//        textView.setText(activity.getString(R.string.min) + " R$ " + menorPreco);
+//        textView.setTypeface(null, Typeface.BOLD);
+//        row.addView(textView);
+//        layout.addView(row);
+//
+//        row = new TableRow(activity.getApplicationContext());
+//        row.setLayoutParams(rowParams);
+//        textView = new TextView(activity.getApplicationContext());
+//        textView.setTextSize(14);
+//        textView.setTextColor(Color.BLACK);
+//
+//        textView.setText(activity.getString(R.string.max) + " R$ " + maiorPreco);
+//        row.addView(textView);
+//        layout.addView(row);
 
         progressDialog.dismiss();
     }//end montarLayout

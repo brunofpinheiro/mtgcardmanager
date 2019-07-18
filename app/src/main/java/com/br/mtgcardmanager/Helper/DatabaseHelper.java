@@ -232,7 +232,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public Long insertAllEditions(){
-        db                    = this.getReadableDatabase();
+//        db                    = this.getReadableDatabase();
         EditionDAO editionDAO = new EditionDAO();
 
         return editionDAO.insertAllEditions(db);

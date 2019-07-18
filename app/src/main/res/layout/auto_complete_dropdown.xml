@@ -3,9 +3,10 @@
 <TextView xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@android:id/text1"
     style="?android:attr/dropDownItemStyle"
-    android:textAppearance="?android:attr/textAppearanceLargePopupMenu"
-    android:singleLine="true"
     android:layout_width="match_parent"
     android:layout_height="?android:attr/listPreferredItemHeight"
+    android:background="@color/colorAccent"
     android:ellipsize="marquee"
-    android:background="@color/white" />
+    android:singleLine="true"
+    android:textAppearance="?android:attr/textAppearanceLargePopupMenu"
+    android:textColor="@color/background" />

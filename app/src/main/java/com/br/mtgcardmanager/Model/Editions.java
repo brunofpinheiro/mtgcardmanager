@@ -27,8 +27,10 @@ public class Editions {
         this.edition_pt    = edition_pt;
     }
 
-    // getters and setters
 
+    /**
+     * GETTERS AND SETTERS
+     */
     public int getId() {
         return id;
     }
