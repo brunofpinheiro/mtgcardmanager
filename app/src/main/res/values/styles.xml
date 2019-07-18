@@ -28,14 +28,15 @@
         <item name="android:windowTitleStyle">@style/Base.DialogWindowTitle.AppCompat</item>
     </style>
 
-    <!--<style name="progressDialog" parent="android:Theme.Holo.Light.Dialog">-->
-    <style name="progressDialog" parent="@android:style/Theme.Holo.Dialog.MinWidth">
+    <style name="customProgressDialog" parent="Theme.AppCompat.Light.Dialog.Alert">
         <item name="android:textColorPrimary">@color/black</item>
+        <item name="colorAccent">@color/colorPrimary</item>
     </style>
 
     <style name="AboutTextAppearance" parent="TextAppearance.AppCompat">
         <item name="android:textColor">@color/black</item>
         <item name="android:textSize">17dp</item>
     </style>
+
 
 </resources>

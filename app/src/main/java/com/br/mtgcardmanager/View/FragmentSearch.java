@@ -137,10 +137,9 @@ public class FragmentSearch extends Fragment implements View.OnClickListener, Ad
         final TextView  mCardNameEN = activity.findViewById(R.id.cardNameEN);
 
 //        tableLayout.removeAllViews();
-        progressDialog = new ProgressDialog(activity, R.style.progressDialog);
-//        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        progressDialog.setCancelable(false);
-        progressDialog = ProgressDialog.show(activity, "", activity.getString(R.string.loading), true);
+        progressDialog = new ProgressDialog(activity, R.style.customProgressDialog);
+        progressDialog.setMessage(activity.getString(R.string.loading));
+        progressDialog.show();
 
         queue        = Volley.newRequestQueue(activity.getApplicationContext());
         searchedCard = query.replace(" ", "+");
