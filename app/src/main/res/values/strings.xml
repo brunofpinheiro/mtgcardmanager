@@ -32,11 +32,12 @@
     <string name="one_card_inserted">1 Carta Adicionada</string>
     <string name="four_cards_inserted">4 Cartas Adicionadas</string>
     <string name="insert_failed">Ocorreu uma falha. Tente novamente.</string>
-    <string name="delete_confirmation">Tem certeza que quer deletar essa carta?</string>
-    <string name="delete_successful">Carta deletada</string>
+    <string name="delete_confirmation">Tem certeza que quer excluir essa carta?</string>
+    <string name="delete_successful">Carta excluída</string>
     <string name="edition_not_found">Desculpe, essa edição não está cadastrada.</string>
     <string name="card_not_found">Carta não encontrada.</string>
     <string name="backup_completed">Backup concluído</string>
+    <string name="atention">Atenção!</string>
 
     <!--BUTTONS-->
     <string name="btn_have_add">TENHO</string>

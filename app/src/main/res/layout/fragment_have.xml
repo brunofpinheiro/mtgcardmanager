@@ -2,7 +2,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/fragment_have">
+    android:id="@+id/fragment_have"
+    android:background="@color/background">
 
     <TableRow
         android:id="@+id/tableRowHeader"
@@ -14,19 +15,17 @@
             android:id="@+id/tvHeaderName"
             android:text="@string/header_name"
             android:layout_weight="10"
-            android:background="#dcdcdc"
-            android:textColor="#000000"
+            android:background="@color/textSecondary"
+            android:textColor="@color/black"
             android:padding="20dip"
             android:gravity="start"
             android:textStyle="bold" />
-            <!--android:layout_span="2"-->
-
 
         <TextView
             android:id="@+id/tvHeaderQtde"
             android:text="@string/header_qty"
             android:layout_weight="1"
-            android:background="#dcdcdc"
+            android:background="@color/textSecondary"
             android:textColor="#000000"
             android:padding="20dip"
             android:gravity="center"
@@ -45,8 +44,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:text="@string/no_cards"
-        android:textColor="@color/black"
-        android:textSize="20dp"
+        android:textColor="@color/textPrimary"
+        android:textSize="20sp"
         android:gravity="center"
         android:visibility="invisible" />
 

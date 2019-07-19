@@ -4,12 +4,12 @@ package com.br.mtgcardmanager.Model;
  * Created by Bruno on 21/07/2016.
  */
 public class HaveCards {
-    int     id;
-    String  name_en;
-    String  name_pt;
-    int     id_edition;
-    int     quantity;
-    String  foil;
+    private int     id;
+    private String  name_en;
+    private String  name_pt;
+    private int     id_edition;
+    private int     quantity;
+    private String  foil;
 
     // constructors
     public HaveCards() {

@@ -23,7 +23,6 @@ import com.br.mtgcardmanager.Adapter.HaveAdapter;
 import com.br.mtgcardmanager.Helper.DatabaseHelper;
 import com.br.mtgcardmanager.Model.HaveCards;
 import com.br.mtgcardmanager.R;
-import com.br.mtgcardmanager.View.MainActivity;
 
 import java.util.ArrayList;
 
@@ -36,13 +35,13 @@ public class FragmentHave extends Fragment {
     private static FragmentActivity           fragment_activity;
     private static TextView                   no_cards_message;
     private static RecyclerView.LayoutManager layoutManager;
-    private ArrayList<HaveCards>              have_cards_list;
-    private RecyclerView.Adapter              haveAdapter;
-    public static int                         context_menu_card_id;
-    public static String                      context_menu_name_en;
-    public static String                      context_menu_name_pt;
-    public static String                      context_menu_foil;
-    private int                               notification_number;
+    private        ArrayList<HaveCards>       have_cards_list;
+    private        RecyclerView.Adapter       haveAdapter;
+    public static  int                        context_menu_card_id;
+    public static  String                     context_menu_name_en;
+    public static  String                     context_menu_name_pt;
+    public static  String                     context_menu_foil;
+    private        int                        notification_number;
 
 
     public FragmentHave() {
@@ -50,8 +49,7 @@ public class FragmentHave extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View rootView    = inflater.inflate(R.layout.fragment_have, container, false);
         recyclerView     = rootView.findViewById(R.id.recycler_view_have);
@@ -65,6 +63,9 @@ public class FragmentHave extends Fragment {
         return rootView;
     }
 
+    /**
+     * Returns a list of all have cards.
+     */
     private void getHaveCards() {
         DatabaseHelper dbHelper = new DatabaseHelper(fragment_activity);
         have_cards_list = new ArrayList<>();
@@ -72,6 +73,10 @@ public class FragmentHave extends Fragment {
         dbHelper.close();
     }
 
+    /**
+     * Get the properties of a long pressed item.
+     * @param card
+     */
     public void getLongPressedItem(HaveCards card) {
         context_menu_card_id = card.getId();
         context_menu_name_en = card.getName_en();
@@ -79,6 +84,11 @@ public class FragmentHave extends Fragment {
         context_menu_foil    = card.getFoil();
     }
 
+    /**
+     * Creates a context menu for the selected item.
+     * @param item
+     * @return
+     */
     @Override
     public boolean onContextItemSelected(MenuItem item) {
         if (item.getGroupId() == 1) {
@@ -119,6 +129,9 @@ public class FragmentHave extends Fragment {
     }
 
 
+    /**
+     * Reloads the data and refreshes the view.
+     */
     public void refreshRecyclerView() {
         // Get the list of have cards from the db
         getHaveCards();
@@ -143,10 +156,14 @@ public class FragmentHave extends Fragment {
         recyclerView.setItemAnimator(new DefaultItemAnimator());
     }
 
+    /**
+     * Shows the confirmation dialog
+     */
     public void deleteConfirmDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(fragment_activity);
+        AlertDialog.Builder builder = new AlertDialog.Builder(fragment_activity, R.style.exclusionConfirmationDialog);
         builder
                 .setMessage(getString(R.string.delete_confirmation))
+                .setTitle(getString(R.string.atention))
                 .setPositiveButton(getString(R.string.yes),  new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {

@@ -23,7 +23,6 @@ import com.br.mtgcardmanager.Adapter.WantAdapter;
 import com.br.mtgcardmanager.Helper.DatabaseHelper;
 import com.br.mtgcardmanager.Model.WantCards;
 import com.br.mtgcardmanager.R;
-import com.br.mtgcardmanager.View.MainActivity;
 
 import java.util.ArrayList;
 
@@ -36,13 +35,13 @@ public class FragmentWant extends Fragment {
     private static FragmentActivity           fragmentActivity;
     private static TextView                   no_cards_message;
     private static RecyclerView.LayoutManager layoutManager;
-    private ArrayList<WantCards>              want_cards_list;
-    private RecyclerView.Adapter              wantAdapter;
-    public static int                         context_menu_card_id;
-    public static String                      context_menu_name_en;
-    public static String                      context_menu_name_pt;
-    public static String                      context_menu_foil;
-    private int                               notification_number;
+    private        ArrayList<WantCards>       want_cards_list;
+    private        RecyclerView.Adapter       wantAdapter;
+    public static  int                        context_menu_card_id;
+    public static  String                     context_menu_name_en;
+    public static  String                     context_menu_name_pt;
+    public static  String                     context_menu_foil;
+    private        int                        notification_number;
 
 
     public FragmentWant() {
@@ -65,6 +64,9 @@ public class FragmentWant extends Fragment {
         return rootView;
     }
 
+    /**
+     * Returns a list of all want cards.
+     */
     private void getWantCards() {
         DatabaseHelper dbHelper = new DatabaseHelper(fragmentActivity);
         want_cards_list = new ArrayList<>();
@@ -72,6 +74,10 @@ public class FragmentWant extends Fragment {
         dbHelper.close();
     }
 
+    /**
+     * Get the properties of a long pressed item.
+     * @param card
+     */
     public void getLongPressedItem(WantCards card){
         context_menu_card_id = card.getId();
         context_menu_name_en = card.getName_en();
@@ -79,6 +85,11 @@ public class FragmentWant extends Fragment {
         context_menu_foil    = card.getFoil();
     }
 
+    /**
+     * Creates a context menu for the selected item.
+     * @param item
+     * @return
+     */
     @Override
     public boolean onContextItemSelected(MenuItem item) {
         if (item.getGroupId() == 2) {
@@ -118,6 +129,9 @@ public class FragmentWant extends Fragment {
         return super.onContextItemSelected(item);
     }
 
+    /**
+     * Reloads the data and refreshes the view.
+     */
     public void refreshRecyclerView() {
         // Get the list of want cards from the db
         getWantCards();
@@ -142,8 +156,11 @@ public class FragmentWant extends Fragment {
         recyclerView.setItemAnimator(new DefaultItemAnimator());
     }
 
+    /**
+     * Shows the confirmation dialog
+     */
     public void deleteConfirmDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this.getContext());
+        AlertDialog.Builder builder = new AlertDialog.Builder(this.getContext(), R.style.exclusionConfirmationDialog);
         builder
                 .setMessage(getString(R.string.delete_confirmation))
                 .setPositiveButton(getString(R.string.yes),  new DialogInterface.OnClickListener() {
