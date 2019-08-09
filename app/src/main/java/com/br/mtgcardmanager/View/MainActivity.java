@@ -1,8 +1,10 @@
 package com.br.mtgcardmanager.View;
 
+import android.app.Activity;
 import android.app.SearchManager;
 import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.MenuItemCompat;
@@ -18,6 +20,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 
 import com.br.mtgcardmanager.Adapter.PagerAdapter;
+import com.br.mtgcardmanager.DriveBackupService;
 import com.br.mtgcardmanager.Helper.DatabaseHelper;
 import com.br.mtgcardmanager.Model.APICard;
 import com.br.mtgcardmanager.Network.GetDataService;
@@ -26,9 +29,18 @@ import com.br.mtgcardmanager.R;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
-import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.api.Scope;
+import com.google.api.client.extensions.android.http.AndroidHttp;
+import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
+import com.google.api.client.json.gson.GsonFactory;
+import com.google.api.services.drive.Drive;
+import com.google.api.services.drive.DriveScopes;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import retrofit2.Call;
@@ -47,12 +59,16 @@ public class MainActivity extends AppCompatActivity { //sem drive api
     private       List<String>                  jsonCardsList = new ArrayList<>();
     private       MenuItem                      searchMenu;
     private       AdView                        mAdView;
-    public static GoogleApiClient               mGoogleApiClient;
+//    public static GoogleApiClient               mGoogleApiClient;
     public static boolean                       running = false;
     private       SearchView.SearchAutoComplete searchAutoComplete;
     private       Call<APICard>                 call = null;
     private       ArrayAdapter<String>          adapter = null;
     private       SearchView                    searchView = null;
+    private       DriveBackupService            driveBackupService;
+    private static final String                 TAG = "MainActivity";
+    private static final int                    REQUEST_CODE_SIGN_IN = 1;
+    private static final int                    REQUEST_CODE_OPEN_DOCUMENT = 2;
 //    private static final String   TAG = "MainActivity";
 //    private static final String   DRIVE_TAG = "Google Drive Activity";
 //    private static final int      REQUEST_CODE_RESOLUTION = 1;
@@ -64,6 +80,8 @@ public class MainActivity extends AppCompatActivity { //sem drive api
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         running = true;
+
+//        driveBackupService = new DriveBackupService(this);
 
 //        scheduleAlarm();
 
@@ -145,24 +163,10 @@ public class MainActivity extends AppCompatActivity { //sem drive api
             mAdView.resume();
         }
 
-//        if (checkIfAlarmIsUp() == false) {
-//            scheduleAlarm();
-//        }
+        requestSignIn();
 
-//        if (mGoogleApiClient == null) {
-//            /**
-//             * Create the API client and bind it to an instance variable.
-//             * We use this instance as the callback for connection and connection failures.
-//             * Since no account name is passed, the user is prompted to choose.
-//             */
-//            mGoogleApiClient = new GoogleApiClient.Builder(this)
-//                    .addApi(Drive.API)
-//                    .addScope(Drive.SCOPE_FILE)
-//                    .addConnectionCallbacks(this)
-//                    .addOnConnectionFailedListener(this)
-//                    .build();
-//        }
-//        mGoogleApiClient.connect();
+//        driveBackupService.createHaveDriveFile();
+//        driveBackupService.createWantDriveFile();
 
 //        scheduleAlarm();
     }
@@ -170,10 +174,10 @@ public class MainActivity extends AppCompatActivity { //sem drive api
     @Override
     protected void onStop() {
         super.onStop();
-//        if (mGoogleApiClient != null) {
-//            // disconnect Google Android Drive API connection.
-//            mGoogleApiClient.disconnect();
-//        }
+        if (driveBackupService.googleApiClient != null) {
+            // disconnect Google Android Drive API connection.
+            driveBackupService.googleApiClient.disconnect();
+        }
         super.onPause();
     }
 
@@ -309,6 +313,74 @@ public class MainActivity extends AppCompatActivity { //sem drive api
     }// setAutoCompleteAdapter
 
 
+    /**
+     * Starts a sign-in activity using {@link #REQUEST_CODE_SIGN_IN}.
+     */
+    private void requestSignIn() {
+        Log.d(TAG, "Requesting sign-in");
+
+        GoogleSignInOptions signInOptions =
+                new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                        .requestEmail()
+                        .requestScopes(new Scope(DriveScopes.DRIVE_FILE))
+                        .build();
+        GoogleSignInClient client = GoogleSignIn.getClient(this, signInOptions);
+
+        // The result of the sign-in Intent is handled in onActivityResult.
+        startActivityForResult(client.getSignInIntent(), REQUEST_CODE_SIGN_IN);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent resultData) {
+        switch (requestCode) {
+            case REQUEST_CODE_SIGN_IN:
+                if (resultCode == Activity.RESULT_OK && resultData != null) {
+                    handleSignInResult(resultData);
+                }
+                break;
+
+            case REQUEST_CODE_OPEN_DOCUMENT:
+                if (resultCode == Activity.RESULT_OK && resultData != null) {
+                    Uri uri = resultData.getData();
+                    if (uri != null) {
+//                        openFileFromFilePicker(uri);
+                    }
+                }
+                break;
+        }
+
+        super.onActivityResult(requestCode, resultCode, resultData);
+    }
+
+    /**
+     * Handles the {@code result} of a completed sign-in activity initiated from {@link
+     * #requestSignIn()}.
+     */
+    private void handleSignInResult(Intent result) {
+        GoogleSignIn.getSignedInAccountFromIntent(result)
+                .addOnSuccessListener(googleAccount -> {
+                    Log.d(TAG, "Signed in as " + googleAccount.getEmail());
+
+                    // Use the authenticated account to sign in to the Drive service.
+                    GoogleAccountCredential credential =
+                            GoogleAccountCredential.usingOAuth2(
+                                    this, Collections.singleton(DriveScopes.DRIVE_FILE));
+                    credential.setSelectedAccount(googleAccount.getAccount());
+                    Drive googleDriveService = new Drive.Builder(
+                                                AndroidHttp.newCompatibleTransport(),
+                                                new GsonFactory(),
+                                                credential)
+                                                .setApplicationName("MTG Card Manager")
+                                                .build();
+
+                    // The DriveServiceHelper encapsulates all REST API and SAF functionality.
+                    // Its instantiation is required before handling any onClick actions.
+                    driveBackupService = new DriveBackupService(googleDriveService);
+                })
+                .addOnFailureListener(exception -> Log.e(TAG, "Unable to sign in.", exception));
+    }
+
+
     //daqui pra baixo é sem drive api
     // ******************************
     // ** Google Drive Api Methods **
@@ -345,8 +417,8 @@ public class MainActivity extends AppCompatActivity { //sem drive api
 //    public void onConnected(Bundle connectionHint) {
 //        Toast.makeText(getApplicationContext(), "Connected", Toast.LENGTH_LONG).show();
 ////        scheduleAlarm();
-////        createHaveDriveFile();
-////        createWantDriveFile();
+//        createHaveDriveFile();
+//        createWantDriveFile();
 //    }
 //
 //    /**
@@ -360,21 +432,21 @@ public class MainActivity extends AppCompatActivity { //sem drive api
 ////        cancelAlarm();
 //    }
 //
-////    public void createHaveDriveFile() {
-////        fileOperation = true;
-////        table_to_backup = "have";
-////        // create new contents resource
-////        Drive.DriveApi.newDriveContents(mGoogleApiClient)
-////                .setResultCallback(driveContentsCallback);
-////    }
-////
-////    public void createWantDriveFile() {
-////        fileOperation = true;
-////        table_to_backup = "want";
-////        // create new contents resource
-////        Drive.DriveApi.newDriveContents(mGoogleApiClient)
-////                .setResultCallback(driveContentsCallback);
-////    }
+//    public void createHaveDriveFile() {
+//        fileOperation = true;
+//        table_to_backup = "have";
+//        // create new contents resource
+//        Drive.DriveApi.newDriveContents(mGoogleApiClient)
+//                .setResultCallback(driveContentsCallback);
+//    }
+//
+//    public void createWantDriveFile() {
+//        fileOperation = true;
+//        table_to_backup = "want";
+//        // create new contents resource
+//        Drive.DriveApi.newDriveContents(mGoogleApiClient)
+//                .setResultCallback(driveContentsCallback);
+//    }
 ////
 ////    /**
 ////     * This is Result result handler of Drive contents.
