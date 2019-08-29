@@ -5,7 +5,8 @@
     android:layout_height="match_parent"
     android:scrollbars="none"
     android:layout_weight="1"
-    android:background="@color/background">
+    android:background="@color/background"
+    android:id="@+id/fragment_search">
 
     <RelativeLayout
         android:id="@+id/relativeLayoutID"

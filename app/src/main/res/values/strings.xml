@@ -25,6 +25,7 @@
     <string name="imageViewContentDescription">Card image</string>
     <string name="prices">Preços</string>
     <string name="pt_br">portuguese (brazil)</string>
+    <string name="action_backup">Iniciar backup</string>
 
     <!--MESSAGES-->
     <string name="search_failed">Falha na consulta. Tente novamente.</string>
@@ -38,6 +39,7 @@
     <string name="card_not_found">Carta não encontrada.</string>
     <string name="backup_completed">Backup concluído</string>
     <string name="atention">Atenção!</string>
+    <string name="backup_in_progress">Backup em andamento...</string>
 
     <!--BUTTONS-->
     <string name="btn_have_add">TENHO</string>

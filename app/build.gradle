@@ -3,16 +3,16 @@ apply plugin: 'com.android.application'
 android {
     signingConfigs {
         apk_padrao {
-            keyAlias 'MtgCardManagerKey'
+            keyAlias 'mtgcardmanager'
             keyPassword '105702'
-            storeFile file('D:/Google Drive/MTG App/KEY_STORE/mtgcardmanager_key.jks')
-            storePassword 'bigode105702'
+            storeFile file('E:/keystore/mtgcardmanager.keystore')
+            storePassword '105702'
         }
     }
     compileSdkVersion 28
     defaultConfig {
         applicationId "com.br.mtgcardmanager"
-        minSdkVersion 14
+        minSdkVersion 21
         targetSdkVersion 28
         versionCode 3
         versionName "3"
@@ -62,10 +62,13 @@ dependencies {
 //    implementation 'com.google.android.gms:play-services-drive:16.1.0'
     implementation 'com.google.http-client:google-http-client-gson:1.26.0'
     implementation 'com.google.android.gms:play-services-auth:16.0.1'
+    implementation 'pub.devrel:easypermissions:0.3.0'
     implementation('com.google.api-client:google-api-client-android:1.26.0') {
         exclude group: 'org.apache.httpcomponents'
     }
     implementation('com.google.apis:google-api-services-drive:v3-rev136-1.25.0') {
         exclude group: 'org.apache.httpcomponents'
     }
+//    implementation 'androidx.multidex:multidex:2.0.1'
+//    implementation 'com.android.support:multidex:1.0.3'
 }
