@@ -14,16 +14,15 @@ import com.google.android.gms.tasks.Tasks;
 import com.google.api.client.http.ByteArrayContent;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
+import com.google.api.services.drive.model.FileList;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.IOException;
 import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
-
-import static android.content.ContentValues.TAG;
 
 
 public class DriveBackupService {
@@ -42,6 +41,7 @@ public class DriveBackupService {
     private Activity        activity;
     private final Executor  mExecutor = Executors.newSingleThreadExecutor();
     private final Drive     mDriveService;
+    private boolean         backupExists = false;
 
     public DriveBackupService(Drive driveService) {
         mDriveService = driveService;
@@ -49,50 +49,75 @@ public class DriveBackupService {
 
 
     /**
-     * Create the backup files on Google Drive.
+     * Create and/or update the backup files on Google Drive.
      * @param activity
      * @param progressDialog
      */
-    public void createFiles(Activity activity, ProgressDialog progressDialog) {
+    public void backupFiles(Activity activity, ProgressDialog progressDialog) {
         exportDbToJSON();
-        //TODO verificar se os arquivos já existem antes de subir de novo
-        createDriveFile("have").addOnFailureListener(exception ->
-                Log.e(TAG, "Não foi possível fazer o backup da tabela Have", exception));
-        createDriveFile("want").addOnFailureListener(exception ->
-                Log.e(TAG, "Não foi possível fazer o backup da tabela Want", exception));
 
-        if (progressDialog != null)
-            progressDialog.dismiss();
+        checkIfBackupExists().addOnSuccessListener(res -> {
+            if (backupExists) {
+                deleteExistingBackup();
+            }
 
-        Toast.makeText(activity, activity.getString(R.string.backup_completed), Toast.LENGTH_SHORT).show();
+            createDriveFile("have");
+            createDriveFile("want");
+
+            if (progressDialog != null) {
+                progressDialog.dismiss();
+            }
+
+            Toast.makeText(activity, activity.getString(R.string.backup_completed), Toast.LENGTH_SHORT).show();
+        });
+    }
+
+    /**
+     * Searches for existing backup files on Google Drive.
+     * Returns true if there is a backup, or false otherwise.
+     * @return
+     */
+    private Task<Boolean> checkIfBackupExists() {
+        return Tasks.call(mExecutor, () -> {
+            FileList driveFiles;
+
+            driveFiles = mDriveService.files().list().execute();
+
+            if (driveFiles.getFiles().size() > 0) {
+                backupExists = true;
+            }
+
+            return backupExists;
+        });
     }
 
     /**
      * Creates a json file in the user's root folder and returns its file ID.
-     * @param table_to_backup
+     * @param tableName
      * @return
      */
-    private Task<String> createDriveFile(String table_to_backup) {
+    private Task<String> createDriveFile(String tableName) {
         return Tasks.call(mExecutor, () -> {
             ByteArrayContent contentStream = null;
-            File googleFile;
-            File metadata;
+            File             googleFile    = new File();
+            File             metadata;
 
-            metadata = new File()
-                    .setParents(Collections.singletonList("root"))
-                    .setMimeType("application/json")
-                    .setName("mtgcardmanager_ " + table_to_backup + ".json");
+            try {
+                metadata = new File()
+                        .setParents(Collections.singletonList("root"))
+                        .setMimeType("application/json")
+                        .setName("mtgcardmanager_" + tableName + ".json");
 
-            if (table_to_backup.equalsIgnoreCase("have")) {
-                contentStream = ByteArrayContent.fromString("text/plain", jsonHaveCards.toString());
-            } else if (table_to_backup.equalsIgnoreCase("want")) {
-                contentStream = ByteArrayContent.fromString("text/plain", jsonWantCards.toString());
-            }
+                if (tableName.equalsIgnoreCase("have")) {
+                    contentStream = ByteArrayContent.fromString("text/plain", jsonHaveCards.toString());
+                } else if (tableName.equalsIgnoreCase("want")) {
+                    contentStream = ByteArrayContent.fromString("text/plain", jsonWantCards.toString());
+                }
 
-            googleFile = mDriveService.files().create(metadata, contentStream).execute();
+                googleFile = mDriveService.files().create(metadata, contentStream).execute();
 
-            if (googleFile == null) {
-                throw new IOException("Retorno nulo ao requisitar a criação do arquivo.");
+            } catch (Exception e) {
+                e.printStackTrace();
             }
 
             return googleFile.getId();
@@ -100,86 +125,29 @@ public class DriveBackupService {
     }
 
     /**
-     * This is Result result handler of Drive contents.
-     * this callback method call CreateFileOnGoogleDrive() method.
+     * Searches for existing backup files and deletes them.
+     * @return
      */
-//    final ResultCallback<DriveApi.DriveContentsResult> driveContentsCallback =
-//            new ResultCallback<DriveApi.DriveContentsResult>() {
-//                @Override
-//                public void onResult(DriveApi.DriveContentsResult result) {
-//                    if (result.getStatus().isSuccess()) {
-//                        if (file_operation == true) {
-//                            CreateFileOnGoogleDrive(result, table_to_backup);
-//                        }
-//                    }
-//                }
-//            };
+    private Task<Void> deleteExistingBackup() {
+        return Tasks.call(mExecutor, () -> {
+            FileList driveFiles;
 
-    /**
-     * Create a file in root folder using MetadataChangeSet object.
-     *
-     * @param result
-     */
-//    public void CreateFileOnGoogleDrive(DriveApi.DriveContentsResult result, final String table_to_backup) {
-//        // Exports the database to a JSONArray
-//        exportDbToJSON();
-//
-//        final DriveContents driveContents = result.getDriveContents();
-//
-//        // Perform I/O off the UI thread.
-//        new Thread() {
-//            @Override
-//            public void run() {
-//                writeContentToDriveContents(driveContents, table_to_backup);
-//            }
-//        }.start();
-//    }
+            try {
+                driveFiles = mDriveService.files().list().execute();
 
-//    private void writeContentToDriveContents(DriveContents driveContents, String table_to_backup) {
-//        OutputStream outputStream = driveContents.getOutputStream();
-//        Writer       writer       = new OutputStreamWriter(outputStream);
-//        try {
-//            if (table_to_backup.equalsIgnoreCase("have")) {
-//                writer.write(json_have_cards.toString());
-//            } else if (table_to_backup.equalsIgnoreCase("want")) {
-//                writer.write(json_want_cards.toString());
-//            }
-//            writer.close();
-//        } catch (IOException e) {
-//            Log.e(DRIVE_TAG, e.getMessage());
-//        }
-//
-//        MetadataChangeSet changeSet = new MetadataChangeSet.Builder()
-//                .setTitle("mtgcardmanager_" + table_to_backup + ".json")
-//                .setMimeType("application/json")
-//                .setStarred(true).build();
-//
-//        // create a file in root folder
-//        Drive.DriveApi.getRootFolder(googleApiClient)
-//                .createFile(googleApiClient, changeSet, driveContents).
-//                setResultCallback(fileCallback);
-//    }
+                if (driveFiles.getFiles().size() > 0) {
+                    for (int i = 0; i < driveFiles.getFiles().size(); i++) {
+                        mDriveService.files().delete(driveFiles.getFiles().get(i).getId()).execute();
+                    }
+                }
 
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
-    /**
-     * Handle result of Created file
-     */
-//    final private ResultCallback<DriveFolder.DriveFileResult> fileCallback = new
-//            ResultCallback<DriveFolder.DriveFileResult>() {
-//                @Override
-//                public void onResult(DriveFolder.DriveFileResult result) {
-//                    if (result.getStatus().isSuccess()) {
-////                        Toast.makeText(getApplicationContext(), "file created: " + "" +
-////                                result.getDriveFile().getDriveId(), Toast.LENGTH_LONG).show();
-//                        if (is_table_want_ready_for_bkp) {
-//                            createWantDriveFile();
-//                            is_table_want_ready_for_bkp = false;
-//                        }
-//                    }
-//                    return;
-//                }
-//            };
-
+            return null;
+        });
+    }
 
     public void exportDbToJSON() {
         jsonHaveCards = convertDbToJSON("have");
@@ -215,7 +183,6 @@ public class DriveBackupService {
             cursor.moveToNext();
         }
         cursor.close();
-        Log.d("TAG_NAME", resultSet.toString());
 
         return resultSet;
     }

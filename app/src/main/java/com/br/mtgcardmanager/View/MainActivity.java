@@ -40,6 +40,7 @@ import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -303,7 +304,7 @@ public class MainActivity extends AppCompatActivity { //sem drive api
     }
 
     /**
-     * Set the adapter for the autocomplete and shows the dropdown list.
+     * Sets the adapter for the autocomplete and shows the dropdown list.
      */
     private void setAutoCompleteAdapter() {
         adapter = new ArrayAdapter<>(this, R.layout.auto_complete_dropdown, jsonCardsList);
@@ -331,7 +332,7 @@ public class MainActivity extends AppCompatActivity { //sem drive api
     }
 
     /**
-     * Start the backup process.
+     * Starts the backup process.
      */
     private void startBackup() {
         progressDialog = new ProgressDialog(this, R.style.customProgressDialog);
@@ -357,9 +358,8 @@ public class MainActivity extends AppCompatActivity { //sem drive api
                 if (resultCode == Activity.RESULT_OK && resultData != null) {
                     handleSignInResult(resultData);
                     if (driveBackupService != null) {
-                        driveBackupService.createFiles(this, progressDialog);
+                        driveBackupService.backupFiles(this, progressDialog);
                     }
-
                 }
         }
     }
@@ -393,233 +393,4 @@ public class MainActivity extends AppCompatActivity { //sem drive api
                 .build();
         driveBackupService = new DriveBackupService(googleDriveService);
     }
-
-    //daqui pra baixo é sem drive api
-    // ******************************
-    // ** Google Drive Api Methods **
-    // ******************************
-//    @Override
-//    public void onConnectionFailed(ConnectionResult result) {
-//        // Called whenever the API client fails to connect.
-//        Log.i(DRIVE_TAG, "GoogleApiClient connection failed: " + result.toString());
-//
-//        if (!result.hasResolution()) {
-//            // show the localized error dialog.
-//            GoogleApiAvailability.getInstance().getErrorDialog(this, result.getErrorCode(), 0).show();
-//            return;
-//        }
-//
-//        /**
-//         *  The failure has a resolution. Resolve it.
-//         *  Called typically when the app is not yet authorized, and an  authorization
-//         *  dialog is displayed to the user.
-//         */
-//        try {
-//            result.startResolutionForResult(this, REQUEST_CODE_RESOLUTION);
-//        } catch (IntentSender.SendIntentException e) {
-//            Log.e(TAG, "Exception while starting resolution activity", e);
-//        }
-//    }
-//
-//    /**
-//     * It invoked when Google API client connected
-//     *
-//     * @param connectionHint
-//     */
-//    @Override
-//    public void onConnected(Bundle connectionHint) {
-//        Toast.makeText(getApplicationContext(), "Connected", Toast.LENGTH_LONG).show();
-////        scheduleAlarm();
-//        createHaveDriveFile();
-//        createWantDriveFile();
-//    }
-//
-//    /**
-//     * It invoked when connection suspended
-//     *
-//     * @param cause
-//     */
-//    @Override
-//    public void onConnectionSuspended(int cause) {
-//        Log.i(DRIVE_TAG, "GoogleApiClient connection suspended");
-////        cancelAlarm();
-//    }
-//
-//    public void createHaveDriveFile() {
-//        fileOperation = true;
-//        table_to_backup = "have";
-//        // create new contents resource
-//        Drive.DriveApi.newDriveContents(mGoogleApiClient)
-//                .setResultCallback(driveContentsCallback);
-//    }
-//
-//    public void createWantDriveFile() {
-//        fileOperation = true;
-//        table_to_backup = "want";
-//        // create new contents resource
-//        Drive.DriveApi.newDriveContents(mGoogleApiClient)
-//                .setResultCallback(driveContentsCallback);
-//    }
-////
-////    /**
-////     * This is Result result handler of Drive contents.
-////     * this callback method call CreateFileOnGoogleDrive() method.
-////     */
-////    final ResultCallback<DriveApi.DriveContentsResult> driveContentsCallback =
-////            new ResultCallback<DriveApi.DriveContentsResult>() {
-////                @Override
-////                public void onResult(DriveApi.DriveContentsResult result) {
-////                    if (result.getStatus().isSuccess()) {
-////                        if (fileOperation == true) {
-////                            CreateFileOnGoogleDrive(result, table_to_backup);
-////                        }
-////                    }
-////                }
-////            };
-////
-////    /**
-////     * Create a file in root folder using MetadataChangeSet object.
-////     *
-////     * @param result
-////     */
-////    public void CreateFileOnGoogleDrive(DriveApi.DriveContentsResult result, final String table_to_backup) {
-////        // Exports the database to a JSONArray
-////        exportDbToJSON();
-////
-////        final DriveContents driveContents = result.getDriveContents();
-////
-////        // Perform I/O off the UI thread.
-////        new Thread() {
-////            @Override
-////            public void run() {
-////                // write content to DriveContents
-////                writeContentToDriveContents(driveContents, table_to_backup);
-////            }
-////        }.start();
-////    }
-////
-////    private void writeContentToDriveContents(DriveContents driveContents, String table_to_backup) {
-////        OutputStream outputStream = driveContents.getOutputStream();
-////        Writer writer = new OutputStreamWriter(outputStream);
-////        try {
-////            if (table_to_backup.equals("have")) {
-////                writer.write(json_have_cards.toString());
-////            } else if (table_to_backup.equals("want")) {
-////                writer.write(json_want_cards.toString());
-////            }
-////            writer.close();
-////        } catch (IOException e) {
-////            Log.e(DRIVE_TAG, e.getMessage());
-////        }
-////
-////        MetadataChangeSet changeSet = new MetadataChangeSet.Builder()
-////                .setTitle("mtgcardmanager_" + table_to_backup + ".json")
-////                .setMimeType("application/json")
-////                .setStarred(true).build();
-////
-////        // create a file in root folder
-////        Drive.DriveApi.getRootFolder(mGoogleApiClient)
-////                .createFile(mGoogleApiClient, changeSet, driveContents).
-////                setResultCallback(fileCallback);
-////    }
-////
-////
-////    /**
-////     * Handle result of Created file
-////     */
-////    final private ResultCallback<DriveFolder.DriveFileResult> fileCallback = new
-////            ResultCallback<DriveFolder.DriveFileResult>() {
-////                @Override
-////                public void onResult(DriveFolder.DriveFileResult result) {
-////                    if (result.getStatus().isSuccess()) {
-////                        Toast.makeText(getApplicationContext(), "file created: " + "" +
-////                                result.getDriveFile().getDriveId(), Toast.LENGTH_LONG).show();
-////                        if (is_table_want_ready_for_bkp) {
-////                            createWantDriveFile();
-////                            is_table_want_ready_for_bkp = false;
-////                        }
-////                    }
-////                    return;
-////                }
-////            };
-////
-////
-////    public void exportDbToJSON (){
-////        json_have_cards = convertDbToJSON("have");
-////        json_want_cards = convertDbToJSON("want");
-////}
-////
-////    private JSONArray convertDbToJSON(String table_name)
-////    {
-////        String myTable      = table_name;//Set name of your table
-////        JSONArray resultSet = new JSONArray();
-////
-////        dbHelper = DatabaseHelper.getInstance(this);
-////        SQLiteDatabase myDataBase = dbHelper.getReadableDatabase();
-////        String searchQuery = "SELECT  * FROM " + myTable;
-////        Cursor cursor = myDataBase.rawQuery(searchQuery, null );
-////
-////        cursor.moveToFirst();
-////        while (cursor.isAfterLast() == false) {
-////            int totalColumn = cursor.getColumnCount();
-////            JSONObject rowObject = new JSONObject();
-////            for( int i=0 ;  i< totalColumn ; i++ ) {
-////                if( cursor.getColumnName(i) != null ) {
-////                    try {
-////                        if( cursor.getString(i) != null ) {
-////                            Log.d("TAG_NAME", cursor.getString(i) );
-////                            rowObject.put(cursor.getColumnName(i) ,  cursor.getString(i) );
-////                        } else {
-////                            rowObject.put( cursor.getColumnName(i) ,  "" );
-////                        }
-////                    } catch( Exception e ) {
-////                        Log.d("TAG_NAME", e.getMessage()  );
-////                    }
-////                }
-////            }
-////            resultSet.put(rowObject);
-////            cursor.moveToNext();
-////        }
-////        cursor.close();
-////        Log.d("TAG_NAME", resultSet.toString() );
-////
-////        return resultSet;
-////    }
-//
-//    public void scheduleAlarm() {
-//        Intent intent = new Intent(getApplicationContext(), AlarmReceiver.class);
-//        final PendingIntent pending_intent = PendingIntent.getBroadcast(this, AlarmReceiver.REQUEST_CODE,
-//                intent, PendingIntent.FLAG_UPDATE_CURRENT);
-////        long first_millis = System.currentTimeMillis(); // alarm is set right away
-//        AlarmManager alarm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
-//
-//        Calendar calendar = Calendar.getInstance();
-//        calendar.setTimeInMillis(System.currentTimeMillis());
-//        calendar.set(Calendar.HOUR_OF_DAY, 20);
-//        calendar.set(Calendar.MINUTE, 40);
-//
-//        alarm.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), 1000 * 60 * 1, pending_intent);
-//
-////        alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, first_millis,
-////                AlarmManager.INTERVAL_FIFTEEN_MINUTES, pendint_intent);
-//    }
-//
-////    public void cancelAlarm() {
-////        Intent intent = new Intent(getApplicationContext(), AlarmReceiver.class);
-////        final PendingIntent pIntent = PendingIntent.getBroadcast(this, AlarmReceiver.REQUEST_CODE,
-////                intent, PendingIntent.FLAG_UPDATE_CURRENT);
-////        AlarmManager alarm = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
-////        alarm.cancel(pIntent);
-////        pIntent.cancel();
-////    }
-////
-////    public boolean checkIfAlarmIsUp() {
-////        Intent intent = new Intent(MainActivity.this, AlarmReceiver.class);//the same as up
-////        intent.setAction(AlarmReceiver.ACTION);//the same as up
-////        boolean alarmUp = (PendingIntent.getBroadcast(MainActivity.this, 1001, intent,
-////                PendingIntent.FLAG_NO_CREATE) != null);//just changed the flag
-////
-////        return alarmUp;
-////    }
-//
 }
