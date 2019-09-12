@@ -23,6 +23,8 @@ import com.br.mtgcardmanager.Adapter.PagerAdapter;
 import com.br.mtgcardmanager.DriveBackupService;
 import com.br.mtgcardmanager.Helper.DatabaseHelper;
 import com.br.mtgcardmanager.Model.APICard;
+import com.br.mtgcardmanager.Model.HaveCards;
+import com.br.mtgcardmanager.Model.WantCards;
 import com.br.mtgcardmanager.Network.GetDataService;
 import com.br.mtgcardmanager.Network.RetrofitClientInstance;
 import com.br.mtgcardmanager.R;
@@ -51,9 +53,7 @@ import retrofit2.Response;
 
 
 
-//public class MainActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,
-//        GoogleApiClient.OnConnectionFailedListener { //com drive api
-public class MainActivity extends AppCompatActivity { //sem drive api
+public class MainActivity extends AppCompatActivity {
 
     private       FragmentSearch                fragmentSearch;
     private       DatabaseHelper                dbHelper;
@@ -74,13 +74,6 @@ public class MainActivity extends AppCompatActivity { //sem drive api
     private static final int                    REQUEST_CODE_UPLOAD_BACKUP = 2;
     private static final int                    REQUEST_CODE_DOWNLOAD_BACKUP = 3;
     private ProgressDialog                      progressDialog;
-
-
-//    private static final String   TAG = "MainActivity";
-//    private static final String   DRIVE_TAG = "Google Drive Activity";
-//    private static final int      REQUEST_CODE_RESOLUTION = 1;
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -149,6 +142,7 @@ public class MainActivity extends AppCompatActivity { //sem drive api
     protected void onStart() {
         super.onStart();
 //        running = true;
+        restoreBackup();
     }
 
     @Override
@@ -343,6 +337,24 @@ public class MainActivity extends AppCompatActivity { //sem drive api
         startActivityForResult(client.getSignInIntent(), REQUEST_CODE_UPLOAD_BACKUP);
     }
 
+    /**
+     * Restores the data found on Google Drive
+     */
+    private void restoreBackup() {
+        DatabaseHelper       dbHelper  = new DatabaseHelper(this);
+        ArrayList<HaveCards> haveCards = dbHelper.getAllHaveCards();
+        ArrayList<WantCards> wantCards = dbHelper.getAllWantCards();
+
+        if (haveCards.size() == 0 && wantCards.size() == 0) {
+//            progressDialog = new ProgressDialog(this, R.style.customProgressDialog);
+//            progressDialog.setMessage(this.getString(R.string.restoring_backup));
+//            progressDialog.show();
+
+            requestSignIn();
+            startActivityForResult(client.getSignInIntent(), REQUEST_CODE_DOWNLOAD_BACKUP);
+        }
+    }
+
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent resultData) {
@@ -359,6 +371,13 @@ public class MainActivity extends AppCompatActivity { //sem drive api
                     handleSignInResult(resultData);
                     if (driveBackupService != null) {
                         driveBackupService.backupFiles(this, progressDialog);
+                    }
+                }
+            case REQUEST_CODE_DOWNLOAD_BACKUP:
+                if (resultCode == Activity.RESULT_OK && resultData != null) {
+                    handleSignInResult(resultData);
+                    if (driveBackupService != null) {
+                        driveBackupService.restoreBackup(this);
                     }
                 }
         }

@@ -37,9 +37,12 @@
     <string name="delete_successful">Carta excluída</string>
     <string name="edition_not_found">Desculpe, essa edição não está cadastrada.</string>
     <string name="card_not_found">Carta não encontrada.</string>
-    <string name="backup_completed">Backup concluído</string>
+    <string name="backup_completed">Backup concluído!</string>
+    <string name="backup_failure">Não consegui restaurar o backup. Feche e abra o aplicativo novamente.</string>
+    <string name="backup_found">Encontrei um backup dos seus dados. Deseja restaura-los?</string>
     <string name="atention">Atenção!</string>
-    <string name="backup_in_progress">Backup em andamento...</string>
+    <string name="backup_in_progress">Backup em andamento…</string>
+    <string name="restoring_backup">Restaurando o backup…</string>
 
     <!--BUTTONS-->
     <string name="btn_have_add">TENHO</string>

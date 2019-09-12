@@ -2,12 +2,16 @@ package com.br.mtgcardmanager;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.br.mtgcardmanager.Helper.DatabaseHelper;
+import com.br.mtgcardmanager.Model.HaveCards;
+import com.br.mtgcardmanager.Model.WantCards;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
@@ -15,12 +19,15 @@ import com.google.api.client.http.ByteArrayContent;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
+import com.google.gson.Gson;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Collections;
-import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
@@ -29,19 +36,12 @@ public class DriveBackupService {
     private JSONArray       jsonHaveCards;
     private JSONArray       jsonWantCards;
     private DatabaseHelper  db_helper;
-    private int             notification_number = 0;
-    private final String    DRIVE_TAG = "Google Drive Activity";
-    private boolean         is_table_want_ready_for_bkp = true;
-    private boolean         file_operation = false;
-    private String          table_to_backup = "";
     public  GoogleApiClient googleApiClient;
-    private final int       REQUEST_CODE_RESOLUTION = 1;
-    private final int       REQUEST_CODE_SIGN_IN = 1;
-    private final int       REQUEST_CODE_OPEN_DOCUMENT = 2;
     private Activity        activity;
     private final Executor  mExecutor = Executors.newSingleThreadExecutor();
     private final Drive     mDriveService;
     private boolean         backupExists = false;
+    private ProgressDialog  progressDialog;
 
     public DriveBackupService(Drive driveService) {
         mDriveService = driveService;
@@ -84,10 +84,10 @@ public class DriveBackupService {
             driveFiles = mDriveService.files().list().execute();
 
             if (driveFiles.getFiles().size() > 0) {
-                backupExists = true;
+                return true;
+            } else {
+                return false;
             }
-
-            return backupExists;
         });
     }
 
@@ -149,23 +149,144 @@ public class DriveBackupService {
         });
     }
 
-    public void exportDbToJSON() {
+
+    public void restoreBackup(Activity activity) {
+        checkIfBackupExists().addOnSuccessListener(res -> {
+            if (res) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(activity, R.style.exclusionConfirmationDialog);
+                builder
+                        .setMessage(activity.getString(R.string.backup_found))
+                        .setTitle(activity.getString(R.string.atention))
+                        .setNegativeButton(activity.getString(R.string.no), (dialog, id) -> {
+                            dialog.cancel();
+                            if (progressDialog != null) {
+                                progressDialog.dismiss();
+                            }
+                        })
+                        .setPositiveButton(activity.getString(R.string.yes), (dialog, id) -> {
+                            progressDialog = new ProgressDialog(activity, R.style.customProgressDialog);
+                            progressDialog.setMessage(activity.getString(R.string.restoring_backup));
+                            progressDialog.show();
+
+                            restoreExistingBackup()
+                                    .addOnCompleteListener(complete -> {
+                                        if (progressDialog != null) {
+                                            progressDialog.dismiss();
+                                        }
+                                    })
+                                    .addOnFailureListener(failure -> showRestoreFailureMessage(activity))
+                                    .addOnSuccessListener(success -> showRestoreSuccessMessage(activity));
+                        })
+                        .show();
+            }
+        });
+    }
+
+    private void showRestoreSuccessMessage(Activity activity) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(activity, R.style.exclusionConfirmationDialog);
+        builder
+                .setMessage(activity.getString(R.string.backup_completed))
+                .setNegativeButton("OK", (dialog, id) -> dialog.cancel())
+                .show();
+    }
+
+    private void showRestoreFailureMessage(Activity activity) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(activity, R.style.exclusionConfirmationDialog);
+        builder
+                .setMessage(activity.getString(R.string.backup_failure))
+                .setNegativeButton("OK", (dialog, id) -> dialog.cancel())
+                .show();
+    }
+
+
+    /**
+     * Downloads the backup files from Google Drive, converts them to a json array and inserts
+     * each object into it's corresponding table.
+     * @return
+     */
+    private Task<Void> restoreExistingBackup() {
+        return Tasks.call(mExecutor, () -> {
+            FileList       driveFiles;
+            InputStream    is;
+            BufferedReader reader;
+            StringBuilder  stringBuilder;
+            String         line;
+            String         content;
+            Gson           gson;
+
+            db_helper  = DatabaseHelper.getInstance(activity);
+            driveFiles = mDriveService.files().list().execute();
+
+            if (driveFiles.getFiles().size() > 0) {
+                for (int i = 0; i < driveFiles.getFiles().size(); i++) {
+                    is = mDriveService.files().get(driveFiles.getFiles().get(i).getId()).executeMediaAsInputStream();
+                    reader = new BufferedReader(new InputStreamReader(is));
+                    stringBuilder = new StringBuilder();
+
+                    while ((line = reader.readLine()) != null) {
+                        stringBuilder.append(line);
+                    }
+
+                    content = stringBuilder.toString();
+                    gson    = new Gson();
+
+                    if (driveFiles.getFiles().get(i).getName().contains("mtgcardmanager_want")) {
+                        WantCards[] wantCards = gson.fromJson(content, WantCards[].class);
+                        for (WantCards card : wantCards) {
+                            WantCards wantCard = new WantCards();
+
+                            wantCard.setId(card.getId());
+                            wantCard.setFoil(card.getFoil());
+                            wantCard.setId_edition(card.getId_edition());
+                            wantCard.setName_en(card.getName_en());
+                            wantCard.setName_pt(card.getName_pt());
+                            wantCard.setQuantity(card.getQuantity());
+
+                            db_helper.insertWantCard(wantCard);
+                        }
+                    } else {
+                        HaveCards[] haveCards = gson.fromJson(content, HaveCards[].class);
+                        for (HaveCards card : haveCards) {
+                            HaveCards haveCard = new HaveCards();
+
+                            haveCard.setId(card.getId());
+                            haveCard.setFoil(card.getFoil());
+                            haveCard.setId_edition(card.getId_edition());
+                            haveCard.setName_en(card.getName_en());
+                            haveCard.setName_pt(card.getName_pt());
+                            haveCard.setQuantity(card.getQuantity());
+
+                            db_helper.insertHaveCard(haveCard);
+                        }
+                    }
+                }
+            }
+            return null;
+        });
+    }
+
+    private void exportDbToJSON() {
         jsonHaveCards = convertDbToJSON("have");
         jsonWantCards = convertDbToJSON("want");
     }
 
     private JSONArray convertDbToJSON(String table_name) {
-        JSONArray resultSet = new JSONArray();
+        JSONArray      jsonArray = new JSONArray();
+        SQLiteDatabase myDataBase;
+        String         searchQuery;
+        Cursor         cursor;
+        int            totalColumn;
+        JSONObject     rowObject;
 
-        db_helper = DatabaseHelper.getInstance(activity);
-        SQLiteDatabase myDataBase = db_helper.getReadableDatabase();
-        String searchQuery = "SELECT  * FROM " + table_name;
-        Cursor cursor = myDataBase.rawQuery(searchQuery, null);
+        db_helper   = DatabaseHelper.getInstance(activity);
+        myDataBase  = db_helper.getReadableDatabase();
+        searchQuery = "SELECT  * FROM " + table_name;
+        cursor      = myDataBase.rawQuery(searchQuery, null);
 
         cursor.moveToFirst();
-        while (cursor.isAfterLast() == false) {
-            int totalColumn = cursor.getColumnCount();
-            JSONObject rowObject = new JSONObject();
+        while (!cursor.isAfterLast()) {
+            totalColumn = cursor.getColumnCount();
+            rowObject   = new JSONObject();
             for (int i = 0; i < totalColumn; i++) {
                 if (cursor.getColumnName(i) != null) {
                     try {
@@ -179,12 +300,12 @@ public class DriveBackupService {
                     }
                 }
             }
-            resultSet.put(rowObject);
+            jsonArray.put(rowObject);
             cursor.moveToNext();
         }
         cursor.close();
 
-        return resultSet;
+        return jsonArray;
     }
 
 //    private void createNotification() {
