@@ -23,8 +23,8 @@ import com.br.mtgcardmanager.Adapter.PagerAdapter;
 import com.br.mtgcardmanager.DriveBackupService;
 import com.br.mtgcardmanager.Helper.DatabaseHelper;
 import com.br.mtgcardmanager.Model.APICard;
-import com.br.mtgcardmanager.Model.HaveCards;
-import com.br.mtgcardmanager.Model.WantCards;
+import com.br.mtgcardmanager.Model.HaveCard;
+import com.br.mtgcardmanager.Model.WantCard;
 import com.br.mtgcardmanager.Network.GetDataService;
 import com.br.mtgcardmanager.Network.RetrofitClientInstance;
 import com.br.mtgcardmanager.R;
@@ -42,7 +42,6 @@ import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -167,7 +166,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        if (driveBackupService.googleApiClient != null) {
+        if (driveBackupService != null) {
             driveBackupService.googleApiClient.disconnect();
         }
         super.onPause();
@@ -342,8 +341,8 @@ public class MainActivity extends AppCompatActivity {
      */
     private void restoreBackup() {
         DatabaseHelper       dbHelper  = new DatabaseHelper(this);
-        ArrayList<HaveCards> haveCards = dbHelper.getAllHaveCards();
-        ArrayList<WantCards> wantCards = dbHelper.getAllWantCards();
+        ArrayList<HaveCard> haveCards = dbHelper.getAllHaveCards();
+        ArrayList<WantCard> wantCards = dbHelper.getAllWantCards();
 
         if (haveCards.size() == 0 && wantCards.size() == 0) {
 //            progressDialog = new ProgressDialog(this, R.style.customProgressDialog);

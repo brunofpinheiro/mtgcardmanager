@@ -1,9 +1,8 @@
 package com.br.mtgcardmanager.View;
 
-
 import android.app.NotificationManager;
 import android.content.Context;
-import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -21,7 +20,7 @@ import android.widget.Toast;
 
 import com.br.mtgcardmanager.Adapter.HaveAdapter;
 import com.br.mtgcardmanager.Helper.DatabaseHelper;
-import com.br.mtgcardmanager.Model.HaveCards;
+import com.br.mtgcardmanager.Model.HaveCard;
 import com.br.mtgcardmanager.R;
 
 import java.util.ArrayList;
@@ -34,9 +33,7 @@ public class FragmentHave extends Fragment {
     private static RecyclerView               recyclerView;
     private static FragmentActivity           fragment_activity;
     private static TextView                   no_cards_message;
-    private static RecyclerView.LayoutManager layoutManager;
-    private        ArrayList<HaveCards>       have_cards_list;
-    private        RecyclerView.Adapter       haveAdapter;
+    private        ArrayList<HaveCard>        have_cards_list;
     public static  int                        context_menu_card_id;
     public static  String                     context_menu_name_en;
     public static  String                     context_menu_name_pt;
@@ -51,13 +48,12 @@ public class FragmentHave extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View rootView    = inflater.inflate(R.layout.fragment_have, container, false);
-        recyclerView     = rootView.findViewById(R.id.recycler_view_have);
-        no_cards_message = rootView.findViewById(R.id.no_cards_message);
-        fragment_activity = this.getActivity();
-        registerForContextMenu(recyclerView);
+        View rootView       = inflater.inflate(R.layout.fragment_have, container, false);
+        recyclerView        = rootView.findViewById(R.id.recycler_view_have);
+        no_cards_message    = rootView.findViewById(R.id.no_cards_message);
+        fragment_activity   = this.getActivity();
         notification_number = 0;
-
+        registerForContextMenu(recyclerView);
         refreshRecyclerView();
 
         return rootView;
@@ -68,8 +64,8 @@ public class FragmentHave extends Fragment {
      */
     private void getHaveCards() {
         DatabaseHelper dbHelper = new DatabaseHelper(fragment_activity);
-        have_cards_list = new ArrayList<>();
-        have_cards_list = dbHelper.getAllHaveCards();
+        have_cards_list         = new ArrayList<>();
+        have_cards_list         = dbHelper.getAllHaveCards();
         dbHelper.close();
     }
 
@@ -77,7 +73,7 @@ public class FragmentHave extends Fragment {
      * Get the properties of a long pressed item.
      * @param card
      */
-    public void getLongPressedItem(HaveCards card) {
+    public void getLongPressedItem(HaveCard card) {
         context_menu_card_id = card.getId();
         context_menu_name_en = card.getName_en();
         context_menu_name_pt = card.getName_pt();
@@ -121,6 +117,17 @@ public class FragmentHave extends Fragment {
                     notification_number = notification_number + 1;
                     mNotificationManager.notify(notification_number, mBuilder.build());
                     return true;
+                case R.id.context_menu_share:
+                    Intent shareIntent;
+                    String listToShare;
+
+                    shareIntent = new Intent();
+                    shareIntent.setAction(Intent.ACTION_SEND);
+                    listToShare = getListToShare();
+                    shareIntent.putExtra(Intent.EXTRA_TEXT, listToShare);
+                    shareIntent.setType("text/plain");
+                    startActivity(shareIntent);
+                    return true;
                 default:
                     return super.onContextItemSelected(item);
             }
@@ -128,11 +135,34 @@ public class FragmentHave extends Fragment {
         return super.onContextItemSelected(item);
     }
 
+    /**
+     * Returns a string with the quantity and the name of all cards.
+     * @return
+     */
+    private String getListToShare() {
+        String cardsToShare = "";
+
+        getHaveCards();
+
+        cardsToShare += "MTG Card Manager" + System.lineSeparator();
+        cardsToShare += System.lineSeparator();
+        cardsToShare += "Tenho";
+
+        for (HaveCard card : have_cards_list) {
+            cardsToShare += System.lineSeparator();
+            cardsToShare += card.getQuantity() + "x " + card.getName_pt();
+        }
+
+        return cardsToShare;
+    }
+
 
     /**
      * Reloads the data and refreshes the view.
      */
     public void refreshRecyclerView() {
+        RecyclerView.Adapter haveAdapter;
+
         // Get the list of have cards from the db
         getHaveCards();
 
@@ -146,7 +176,7 @@ public class FragmentHave extends Fragment {
         }
 
         // Sets up the recycler view with the list of cards
-        layoutManager = new LinearLayoutManager(fragment_activity);
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(fragment_activity);
         recyclerView.setLayoutManager(layoutManager);
 
         haveAdapter = new HaveAdapter(fragment_activity, have_cards_list);
@@ -164,20 +194,14 @@ public class FragmentHave extends Fragment {
         builder
                 .setMessage(getString(R.string.delete_confirmation))
                 .setTitle(getString(R.string.atention))
-                .setPositiveButton(getString(R.string.yes),  new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int id) {
-                        DatabaseHelper dbHelper = DatabaseHelper.getInstance(fragment_activity);
-                        dbHelper.deleteHaveCard(context_menu_card_id);
-                        refreshRecyclerView();
-                        Toast.makeText(fragment_activity, R.string.delete_successful, Toast.LENGTH_SHORT).show();
-                    }
+                .setPositiveButton(getString(R.string.yes), (dialog, id) -> {
+                    DatabaseHelper dbHelper = DatabaseHelper.getInstance(fragment_activity);
+                    dbHelper.deleteHaveCard(context_menu_card_id);
+                    refreshRecyclerView();
+                    Toast.makeText(fragment_activity, R.string.delete_successful, Toast.LENGTH_SHORT).show();
                 })
-                .setNegativeButton(getString(R.string.no), new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog,int id) {
-                        dialog.cancel();
-                    }
+                .setNegativeButton(getString(R.string.no), (dialog, id) -> {
+                    dialog.cancel();
                 })
                 .show();
     }

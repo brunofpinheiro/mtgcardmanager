@@ -10,7 +10,7 @@ import com.br.mtgcardmanager.View.FragmentHave;
 import com.br.mtgcardmanager.View.HaveViewHolder;
 import com.br.mtgcardmanager.Helper.DatabaseHelper;
 import com.br.mtgcardmanager.LongClickListener;
-import com.br.mtgcardmanager.Model.HaveCards;
+import com.br.mtgcardmanager.Model.HaveCard;
 import com.br.mtgcardmanager.R;
 
 import java.util.ArrayList;
@@ -20,9 +20,9 @@ import java.util.ArrayList;
  */
 public class HaveAdapter extends RecyclerView.Adapter<HaveViewHolder> {
     private Context              context;
-    private ArrayList<HaveCards> have_cards;
+    private ArrayList<HaveCard> have_cards;
 
-    public HaveAdapter (Context context, ArrayList<HaveCards> have_cards){
+    public HaveAdapter (Context context, ArrayList<HaveCard> have_cards){
         this.context    = context;
         this.have_cards = have_cards;
     }
@@ -39,7 +39,7 @@ public class HaveAdapter extends RecyclerView.Adapter<HaveViewHolder> {
     @Override
     public void onBindViewHolder (final HaveViewHolder viewHolder, int position) {
         DatabaseHelper  dbHelper = new DatabaseHelper(context);
-        final HaveCards card = have_cards.get(position);
+        final HaveCard card = have_cards.get(position);
 
         if (card.getName_en().isEmpty()) {
             viewHolder.mCardName.setText(card.getName_pt());

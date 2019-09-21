@@ -28,8 +28,8 @@ import com.br.mtgcardmanager.Adapter.EditionsDialogAdapter;
 import com.br.mtgcardmanager.Helper.DatabaseHelper;
 import com.br.mtgcardmanager.Helper.UtilsHelper;
 import com.br.mtgcardmanager.Model.Editions;
-import com.br.mtgcardmanager.Model.HaveCards;
-import com.br.mtgcardmanager.Model.WantCards;
+import com.br.mtgcardmanager.Model.HaveCard;
+import com.br.mtgcardmanager.Model.WantCard;
 import com.br.mtgcardmanager.R;
 import com.squareup.picasso.Picasso;
 
@@ -48,8 +48,8 @@ public class FragmentSearch extends Fragment implements View.OnClickListener, Ad
     private static Elements            cardNamePT;
     private static Elements            cardNameEN;
     private Editions                   edition;
-    private HaveCards                  haveCard = new HaveCards();
-    private WantCards                  wantCard = new WantCards();
+    private HaveCard haveCard = new HaveCard();
+    private WantCard wantCard = new WantCard();
     private String                     foil;
     Boolean               secondRequest;
     Boolean               longPress;
@@ -437,7 +437,7 @@ public class FragmentSearch extends Fragment implements View.OnClickListener, Ad
         dbHelper  = DatabaseHelper.getInstance(this.getContext());
         int       id_edition;
         int       quantity;
-        HaveCards existingCard;
+        HaveCard existingCard;
 
         // Get edition info
         selectedEdition = utils.padronizeEdition(selectedEdition);
@@ -495,7 +495,7 @@ public class FragmentSearch extends Fragment implements View.OnClickListener, Ad
 
         int       id_edition;
         int       quantity;
-        WantCards existingCard;
+        WantCard existingCard;
 
         // Get edition info
         selectedEdition = utils.padronizeEdition(selectedEdition);

@@ -15,6 +15,7 @@
     <string name="search">Consultar</string>
     <string name="delete">Deletar</string>
     <string name="add_note">Criar lembrete</string>
+    <string name="share">Compartilhar lista</string>
     <string name="notification_title">MTG Card Manager</string>
     <string name="have_notification_text">Separar:</string>
     <string name="want_notification_text">Pegar:</string>

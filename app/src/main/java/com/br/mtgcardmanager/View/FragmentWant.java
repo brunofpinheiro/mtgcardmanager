@@ -4,6 +4,7 @@ package com.br.mtgcardmanager.View;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -21,7 +22,7 @@ import android.widget.Toast;
 
 import com.br.mtgcardmanager.Adapter.WantAdapter;
 import com.br.mtgcardmanager.Helper.DatabaseHelper;
-import com.br.mtgcardmanager.Model.WantCards;
+import com.br.mtgcardmanager.Model.WantCard;
 import com.br.mtgcardmanager.R;
 
 import java.util.ArrayList;
@@ -35,7 +36,7 @@ public class FragmentWant extends Fragment {
     private static FragmentActivity           fragmentActivity;
     private static TextView                   no_cards_message;
     private static RecyclerView.LayoutManager layoutManager;
-    private        ArrayList<WantCards>       want_cards_list;
+    private        ArrayList<WantCard>        want_cards_list;
     private        RecyclerView.Adapter       wantAdapter;
     public static  int                        context_menu_card_id;
     public static  String                     context_menu_name_en;
@@ -78,7 +79,7 @@ public class FragmentWant extends Fragment {
      * Get the properties of a long pressed item.
      * @param card
      */
-    public void getLongPressedItem(WantCards card){
+    public void getLongPressedItem(WantCard card){
         context_menu_card_id = card.getId();
         context_menu_name_en = card.getName_en();
         context_menu_name_pt = card.getName_pt();
@@ -122,11 +123,43 @@ public class FragmentWant extends Fragment {
                     notification_number = notification_number + 1;
                     mNotificationManager.notify(notification_number, mBuilder.build());
                     return true;
+                case R.id.context_menu_share:
+                    Intent shareIntent;
+                    String listToShare;
+
+                    shareIntent = new Intent();
+                    shareIntent.setAction(Intent.ACTION_SEND);
+                    listToShare = getListToShare();
+                    shareIntent.putExtra(Intent.EXTRA_TEXT, listToShare);
+                    shareIntent.setType("text/plain");
+                    startActivity(shareIntent);
+                    return true;
                 default:
                     return super.onContextItemSelected(item);
             }
         }
         return super.onContextItemSelected(item);
+    }
+
+    /**
+     * Returns a string with the quantity and the name of all cards.
+     * @return
+     */
+    private String getListToShare() {
+        String cardsToShare = "";
+
+        getWantCards();
+
+        cardsToShare += "MTG Card Manager" + System.lineSeparator();
+        cardsToShare += System.lineSeparator();
+        cardsToShare += "Quero";
+
+        for (WantCard card : want_cards_list) {
+            cardsToShare += System.lineSeparator();
+            cardsToShare += card.getQuantity() + "x " + card.getName_pt();
+        }
+
+        return cardsToShare;
     }
 
     /**

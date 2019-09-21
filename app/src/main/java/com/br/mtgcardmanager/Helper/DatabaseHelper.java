@@ -2,23 +2,15 @@ package com.br.mtgcardmanager.Helper;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.database.sqlite.SQLiteStatement;
-import android.util.Log;
-import android.widget.Toast;
 
 import com.br.mtgcardmanager.DAO.EditionDAO;
 import com.br.mtgcardmanager.DAO.HaveDAO;
 import com.br.mtgcardmanager.DAO.WantDAO;
 import com.br.mtgcardmanager.Model.Editions;
-import com.br.mtgcardmanager.Model.HaveCards;
-import com.br.mtgcardmanager.Model.WantCards;
-import com.br.mtgcardmanager.R;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
+import com.br.mtgcardmanager.Model.HaveCard;
+import com.br.mtgcardmanager.Model.WantCard;
 
 import java.util.ArrayList;
 
@@ -131,7 +123,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     //********************************
     //***** HAVE Table functions *****
     //********************************
-    public Long insertHaveCard(HaveCards haveCard){
+    public Long insertHaveCard(HaveCard haveCard){
         db              = this.getWritableDatabase();
         HaveDAO haveDAO = new HaveDAO();
 
@@ -140,7 +132,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return card_id;
     }
 
-    public ArrayList<HaveCards> getAllHaveCards(){
+    public ArrayList<HaveCard> getAllHaveCards(){
         db              = getReadableDatabase();
         HaveDAO haveDAO = new HaveDAO();
 
@@ -154,7 +146,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         haveDAO.deleteHaveCard(db, id_have_card);
     }
 
-    public HaveCards checkIfHaveCardExists(String name_en, int id_edition, String foil){
+    public HaveCard checkIfHaveCardExists(String name_en, int id_edition, String foil){
         db              = this.getReadableDatabase();
         HaveDAO haveDAO = new HaveDAO();
 
@@ -165,7 +157,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     //********************************
     //***** WANT Table functions *****
     //********************************
-    public Long insertWantCard(WantCards wantCard){
+    public Long insertWantCard(WantCard wantCard){
         db              = this.getWritableDatabase();
         WantDAO wantDAO = new WantDAO();
 
@@ -174,7 +166,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return card_id;
     }
 
-    public ArrayList<WantCards> getAllWantCards(){
+    public ArrayList<WantCard> getAllWantCards(){
         db              = getReadableDatabase();
         WantDAO wantDAO = new WantDAO();
 
@@ -188,7 +180,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         wantDAO.deleteWantCard(db, id_want_card);
     }
 
-    public WantCards checkIfWantCardExists(String name_en, int id_edition, String foil){
+    public WantCard checkIfWantCardExists(String name_en, int id_edition, String foil){
         db              = this.getReadableDatabase();
         WantDAO wantDAO = new WantDAO();
 

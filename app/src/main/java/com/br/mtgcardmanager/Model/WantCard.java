@@ -3,7 +3,7 @@ package com.br.mtgcardmanager.Model;
 /**
  * Created by Bruno on 21/07/2016.
  */
-public class WantCards {
+public class WantCard {
     private int    id;
     private String name_en;
     private String name_pt;
@@ -12,11 +12,11 @@ public class WantCards {
     private String foil;
 
     // constructors
-    public WantCards() {
+    public WantCard() {
 
     }
 
-    public WantCards(String name_en, String name_pt, int id_edition, int quantity, String foil) {
+    public WantCard(String name_en, String name_pt, int id_edition, int quantity, String foil) {
         this.name_en    = name_en;
         this.name_pt    = name_pt;
         this.id_edition = id_edition;
@@ -24,7 +24,7 @@ public class WantCards {
         this.foil       = foil;
     }
 
-    public WantCards(int id, String name_en, String name_pt, int id_edition, int quantity, String foil) {
+    public WantCard(int id, String name_en, String name_pt, int id_edition, int quantity, String foil) {
         this.id         = id;
         this.name_en    = name_en;
         this.name_pt    = name_pt;

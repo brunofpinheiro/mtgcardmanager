@@ -5,7 +5,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
-import com.br.mtgcardmanager.Model.WantCards;
+import com.br.mtgcardmanager.Model.WantCard;
 
 import java.util.ArrayList;
 
@@ -21,7 +21,7 @@ import static com.br.mtgcardmanager.Helper.DatabaseHelper.TABLE_WANT;
 public class WantDAO {
     public long card_id;
 
-    public Long insertWantCard(SQLiteDatabase db, WantCards wantCard){
+    public Long insertWantCard(SQLiteDatabase db, WantCard wantCard){
         ContentValues values = new ContentValues();
 
         values.put(KEY_NAME_EN, wantCard.getName_en());
@@ -36,8 +36,8 @@ public class WantDAO {
         return card_id;
     }
 
-    public ArrayList<WantCards> getAllWantCards(SQLiteDatabase db){
-        ArrayList<WantCards> cards       = new ArrayList<>();
+    public ArrayList<WantCard> getAllWantCards(SQLiteDatabase db){
+        ArrayList<WantCard> cards       = new ArrayList<>();
         String               selectQuery = "";
         Cursor               cursor      = null;
 
@@ -48,7 +48,7 @@ public class WantDAO {
         // looping through all rows and adding to list
         if (cursor.moveToFirst()){
             do {
-                WantCards card = new WantCards();
+                WantCard card = new WantCard();
                 card.setId(cursor.getInt(cursor.getColumnIndex(KEY_ID)));
                 card.setName_en(cursor.getString(cursor.getColumnIndex(KEY_NAME_EN)));
                 card.setName_pt(cursor.getString(cursor.getColumnIndex(KEY_NAME_PT)));
@@ -70,7 +70,7 @@ public class WantDAO {
     }
 
 
-    public WantCards checkIfWantCardExists(SQLiteDatabase db, String name_en, int id_edition, String foil){
+    public WantCard checkIfWantCardExists(SQLiteDatabase db, String name_en, int id_edition, String foil){
         String selectQuery = "SELECT *" +
                 " FROM " + TABLE_WANT +
                 " WHERE " + KEY_NAME_EN + " = '" + name_en + "'" +
@@ -84,7 +84,7 @@ public class WantDAO {
             cursor.moveToFirst();
         }
 
-        WantCards existingCard = new WantCards();
+        WantCard existingCard = new WantCard();
 
         if (cursor.getCount() > 0) {
             existingCard.setId(cursor.getInt(cursor.getColumnIndex(KEY_ID)));

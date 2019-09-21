@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import com.br.mtgcardmanager.Helper.DatabaseHelper;
-import com.br.mtgcardmanager.Model.HaveCards;
+import com.br.mtgcardmanager.Model.HaveCard;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -26,7 +26,7 @@ import static com.br.mtgcardmanager.Helper.DatabaseHelper.TABLE_HAVE;
 public class HaveDAO {
     public long card_id;
 
-    public Long insertHaveCard(SQLiteDatabase db, HaveCards haveCard){
+    public Long insertHaveCard(SQLiteDatabase db, HaveCard haveCard){
         ContentValues values = new ContentValues();
         values.put(KEY_NAME_EN, haveCard.getName_en());
         values.put(KEY_NAME_PT, haveCard.getName_pt());
@@ -40,10 +40,10 @@ public class HaveDAO {
         return card_id;
     }
 
-    public ArrayList<HaveCards> getAllHaveCards(SQLiteDatabase db){
-        ArrayList<HaveCards> cards       = new ArrayList<>();
-        String               selectQuery = "";
-        Cursor               cursor      = null;
+    public ArrayList<HaveCard> getAllHaveCards(SQLiteDatabase db){
+        ArrayList<HaveCard> cards       = new ArrayList<>();
+        String              selectQuery = "";
+        Cursor              cursor      = null;
 
         Log.e(LOG, selectQuery);
         selectQuery = "SELECT * FROM " + TABLE_HAVE + " ORDER BY " + KEY_NAME_PT;
@@ -52,7 +52,7 @@ public class HaveDAO {
         // looping through all rows and adding to list
         if (cursor.moveToFirst()){
             do {
-                HaveCards card = new HaveCards();
+                HaveCard card = new HaveCard();
                 card.setId(cursor.getInt(cursor.getColumnIndex(KEY_ID)));
                 card.setName_en(cursor.getString(cursor.getColumnIndex(KEY_NAME_EN)));
                 card.setName_pt(cursor.getString(cursor.getColumnIndex(KEY_NAME_PT)));
@@ -73,7 +73,7 @@ public class HaveDAO {
         db.close();
     }
 
-    public HaveCards checkIfHaveCardExists(SQLiteDatabase db, String name_en, int id_edition, String foil){
+    public HaveCard checkIfHaveCardExists(SQLiteDatabase db, String name_en, int id_edition, String foil){
         String selectQuery = "SELECT *" +
                 " FROM " + TABLE_HAVE +
                 " WHERE " + KEY_NAME_EN + " = '" + name_en + "'" +
@@ -87,7 +87,7 @@ public class HaveDAO {
             cursor.moveToFirst();
         }
 
-        HaveCards existingCard = new HaveCards();
+        HaveCard existingCard = new HaveCard();
 
         if (cursor.getCount() > 0) {
             existingCard.setId(cursor.getInt(cursor.getColumnIndex(KEY_ID)));
@@ -107,49 +107,5 @@ public class HaveDAO {
 
         cursor.close();
         return existingCard;
-    }
-
-    public JSONArray exportHaveToJSON(Context context) {
-
-//        String myPath = DB_PATH + DB_NAME;// Set path to your database
-//        String myTable = TABLE_NAME;//Set name of your table
-//or you can use `context.getDatabasePath("my_db_test.db")`
-
-        String myPath = context.getDatabasePath(DatabaseHelper.DATABASE_NAME).getAbsolutePath();
-        String myTable = TABLE_HAVE;
-
-        SQLiteDatabase myDataBase = SQLiteDatabase.openDatabase(myPath, null, SQLiteDatabase.OPEN_READONLY);
-
-        String searchQuery = "SELECT  * FROM " + myTable;
-        Cursor cursor      = myDataBase.rawQuery(searchQuery, null );
-
-        JSONArray resultSet = new JSONArray();
-
-        cursor.moveToFirst();
-        while (!cursor.isAfterLast()) {
-            int totalColumn = cursor.getColumnCount();
-            JSONObject rowObject = new JSONObject();
-
-            for(int i = 0 ;  i < totalColumn ; i++) {
-                if(cursor.getColumnName(i) != null) {
-                    try {
-                        if(cursor.getString(i) != null) {
-                            Log.d("TAG_NAME", cursor.getString(i));
-                            rowObject.put(cursor.getColumnName(i), cursor.getString(i));
-                        }
-                        else {
-                            rowObject.put(cursor.getColumnName(i) , "");
-                        }
-                    } catch( Exception e) {
-                        Log.d("TAG_NAME", e.getMessage());
-                    }
-                }
-            }
-            resultSet.put(rowObject);
-            cursor.moveToNext();
-        }
-        cursor.close();
-        Log.d("TAG_NAME", resultSet.toString());
-        return resultSet;
     }
 }

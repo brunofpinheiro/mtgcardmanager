@@ -2,7 +2,6 @@ package com.br.mtgcardmanager;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.v7.app.AlertDialog;
@@ -10,8 +9,8 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.br.mtgcardmanager.Helper.DatabaseHelper;
-import com.br.mtgcardmanager.Model.HaveCards;
-import com.br.mtgcardmanager.Model.WantCards;
+import com.br.mtgcardmanager.Model.HaveCard;
+import com.br.mtgcardmanager.Model.WantCard;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
@@ -231,9 +230,9 @@ public class DriveBackupService {
                     gson    = new Gson();
 
                     if (driveFiles.getFiles().get(i).getName().contains("mtgcardmanager_want")) {
-                        WantCards[] wantCards = gson.fromJson(content, WantCards[].class);
-                        for (WantCards card : wantCards) {
-                            WantCards wantCard = new WantCards();
+                        WantCard[] wantCards = gson.fromJson(content, WantCard[].class);
+                        for (WantCard card : wantCards) {
+                            WantCard wantCard = new WantCard();
 
                             wantCard.setId(card.getId());
                             wantCard.setFoil(card.getFoil());
@@ -245,9 +244,9 @@ public class DriveBackupService {
                             db_helper.insertWantCard(wantCard);
                         }
                     } else {
-                        HaveCards[] haveCards = gson.fromJson(content, HaveCards[].class);
-                        for (HaveCards card : haveCards) {
-                            HaveCards haveCard = new HaveCards();
+                        HaveCard[] haveCards = gson.fromJson(content, HaveCard[].class);
+                        for (HaveCard card : haveCards) {
+                            HaveCard haveCard = new HaveCard();
 
                             haveCard.setId(card.getId());
                             haveCard.setFoil(card.getFoil());

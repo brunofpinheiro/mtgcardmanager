@@ -9,7 +9,7 @@ import android.view.ViewGroup;
 import com.br.mtgcardmanager.View.FragmentWant;
 import com.br.mtgcardmanager.Helper.DatabaseHelper;
 import com.br.mtgcardmanager.LongClickListener;
-import com.br.mtgcardmanager.Model.WantCards;
+import com.br.mtgcardmanager.Model.WantCard;
 import com.br.mtgcardmanager.R;
 import com.br.mtgcardmanager.View.WantViewHolder;
 
@@ -20,9 +20,9 @@ import java.util.ArrayList;
  */
 public class WantAdapter extends RecyclerView.Adapter<WantViewHolder> {
     private Context              context;
-    private ArrayList<WantCards> want_cards;
+    private ArrayList<WantCard> want_cards;
 
-    public WantAdapter(Context context, ArrayList<WantCards> want_cards){
+    public WantAdapter(Context context, ArrayList<WantCard> want_cards){
         this.context    = context;
         this.want_cards = want_cards;
     }
@@ -39,7 +39,7 @@ public class WantAdapter extends RecyclerView.Adapter<WantViewHolder> {
     @Override
     public void onBindViewHolder (final WantViewHolder viewHolder, int position) {
         DatabaseHelper  dbHelper = new DatabaseHelper(context);
-        final WantCards card = want_cards.get(position);
+        final WantCard card = want_cards.get(position);
 
         if (card.getName_en().isEmpty()) {
             viewHolder.mCardName.setText(card.getName_pt());
