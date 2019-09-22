@@ -70,7 +70,7 @@ public class HaveViewHolder extends RecyclerView.ViewHolder implements View.OnLo
         String      name;
         int         quantity;
         int         id_edition;
-        HaveCard existingCard;
+        HaveCard    existingCard;
 
         edition_name = mCardEdition.getText().toString();
         name         = mCardName.getText().toString();

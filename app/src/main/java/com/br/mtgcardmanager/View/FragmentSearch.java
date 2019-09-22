@@ -477,9 +477,9 @@ public class FragmentSearch extends Fragment implements View.OnClickListener, Ad
 
                 // Refresh the contents of FragmentHave
                 FragmentHave fragmentHave = new FragmentHave();
-                fragmentHave.refreshRecyclerView();
+                fragmentHave.refreshRecyclerView(true);
             } else {
-                Toast.makeText(getActivity().getApplicationContext(), R.string.insert_failed, Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity().getApplicationContext(), R.string.insert_failed, Toast.LENGTH_LONG).show();
             }
 
             longPress        = false;
@@ -535,7 +535,7 @@ public class FragmentSearch extends Fragment implements View.OnClickListener, Ad
 
                 // Refresh the contents of FragmentHave
                 FragmentWant fragmentWant = new FragmentWant();
-                fragmentWant.refreshRecyclerView();
+                fragmentWant.refreshRecyclerView(true);
 
             } else {
                 Toast.makeText(getActivity().getApplicationContext(), R.string.insert_failed, Toast.LENGTH_SHORT).show();

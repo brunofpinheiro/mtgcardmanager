@@ -1,8 +1,10 @@
 package com.br.mtgcardmanager.View;
 
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -30,15 +32,15 @@ import java.util.ArrayList;
  * A simple {@link Fragment} subclass.
  */
 public class FragmentHave extends Fragment {
-    private static RecyclerView               recyclerView;
-    private static FragmentActivity           fragment_activity;
-    private static TextView                   no_cards_message;
-    private        ArrayList<HaveCard>        have_cards_list;
-    public static  int                        context_menu_card_id;
-    public static  String                     context_menu_name_en;
-    public static  String                     context_menu_name_pt;
-    public static  String                     context_menu_foil;
-    private        int                        notification_number;
+    private static RecyclerView        recyclerView;
+    private static FragmentActivity    fragmentActivity;
+    private static TextView            mNoCardsMessage;
+    public         ArrayList<HaveCard> haveCardsList;
+    public  static int                 contextMenuCardId;
+    public  static String              contextMenuNameEn;
+    public  static String              contextMenuNamePt;
+    public  static String              contextMenuFoil;
+    private        int                 notificationNumber;
 
 
     public FragmentHave() {
@@ -47,14 +49,14 @@ public class FragmentHave extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        View rootView       = inflater.inflate(R.layout.fragment_have, container, false);
-        recyclerView        = rootView.findViewById(R.id.recycler_view_have);
-        no_cards_message    = rootView.findViewById(R.id.no_cards_message);
-        fragment_activity   = this.getActivity();
-        notification_number = 0;
+        View rootView      = inflater.inflate(R.layout.fragment_have, container, false);
+        recyclerView       = rootView.findViewById(R.id.recycler_view_have);
+        mNoCardsMessage    = rootView.findViewById(R.id.no_cards_message);
+        fragmentActivity   = this.getActivity();
+        notificationNumber = 0;
+
         registerForContextMenu(recyclerView);
-        refreshRecyclerView();
+        refreshRecyclerView(true);
 
         return rootView;
     }
@@ -62,10 +64,13 @@ public class FragmentHave extends Fragment {
     /**
      * Returns a list of all have cards.
      */
-    private void getHaveCards() {
-        DatabaseHelper dbHelper = new DatabaseHelper(fragment_activity);
-        have_cards_list         = new ArrayList<>();
-        have_cards_list         = dbHelper.getAllHaveCards();
+    public void getHaveCards() {
+        DatabaseHelper dbHelper;
+
+        dbHelper      = new DatabaseHelper(fragmentActivity);
+        haveCardsList = new ArrayList<>();
+        haveCardsList = dbHelper.getAllHaveCards();
+
         dbHelper.close();
     }
 
@@ -74,10 +79,10 @@ public class FragmentHave extends Fragment {
      * @param card
      */
     public void getLongPressedItem(HaveCard card) {
-        context_menu_card_id = card.getId();
-        context_menu_name_en = card.getName_en();
-        context_menu_name_pt = card.getName_pt();
-        context_menu_foil    = card.getFoil();
+        contextMenuCardId = card.getId();
+        contextMenuNameEn = card.getName_en();
+        contextMenuNamePt = card.getName_pt();
+        contextMenuFoil   = card.getFoil();
     }
 
     /**
@@ -90,49 +95,85 @@ public class FragmentHave extends Fragment {
         if (item.getGroupId() == 1) {
             switch (item.getItemId()) {
                 case R.id.context_menu_search:
-                    if (context_menu_name_en.isEmpty()) {
-                        ((MainActivity) getActivity()).searchCard(context_menu_name_pt);
+                    if (contextMenuNameEn.isEmpty()) {
+                        ((MainActivity) getActivity()).searchCard(contextMenuNamePt);
                     } else {
-                        ((MainActivity) getActivity()).searchCard(context_menu_name_en);
+                        ((MainActivity) getActivity()).searchCard(contextMenuNameEn);
                     }
                     return true;
                 case R.id.context_menu_delete:
                     deleteConfirmDialog();
                     return true;
                 case R.id.context_menu_add_note:
-                    String foil = "";
-
-                    if (context_menu_foil.equals("S")) {
-                        foil = "(" + getString(R.string.foil) + ")";
-                    }
-
-                    NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(fragment_activity);
-
-                    mBuilder.setSmallIcon(R.mipmap.ic_notification_white);
-                    mBuilder.setContentTitle(getString(R.string.notification_title));
-                    mBuilder.setContentText(getString(R.string.have_notification_text) + " " + context_menu_name_pt + foil);
-
-                    NotificationManager mNotificationManager = (NotificationManager)
-                            getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
-                    notification_number = notification_number + 1;
-                    mNotificationManager.notify(notification_number, mBuilder.build());
+                    createNotification();
                     return true;
                 case R.id.context_menu_share:
-                    Intent shareIntent;
-                    String listToShare;
-
-                    shareIntent = new Intent();
-                    shareIntent.setAction(Intent.ACTION_SEND);
-                    listToShare = getListToShare();
-                    shareIntent.putExtra(Intent.EXTRA_TEXT, listToShare);
-                    shareIntent.setType("text/plain");
-                    startActivity(shareIntent);
+                    startShareIntent();
                     return true;
                 default:
                     return super.onContextItemSelected(item);
             }
         }
         return super.onContextItemSelected(item);
+    }
+
+    /**
+     * Creates a notification
+     */
+    private void createNotification() {
+        NotificationCompat.Builder builder;
+        NotificationManager        notificationManager;
+        String                     foil = "";
+
+        createNotificationChannel();
+
+        if (contextMenuFoil.equals("S")) {
+            foil = "(" + getString(R.string.foil) + ")";
+        }
+
+        builder = new NotificationCompat.Builder(fragmentActivity, getString(R.string.app_name));
+
+        builder.setSmallIcon(R.mipmap.ic_notification_white);
+        builder.setContentText(getString(R.string.have_notification_text) + " " + contextMenuNamePt + foil);
+
+        notificationManager = (NotificationManager)getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationNumber++;
+        notificationManager.notify(notificationNumber, builder.build());
+    }
+
+    /**
+     * Creates the notification channel for the notifications (only necessary for Android O or later)
+     */
+    private void createNotificationChannel() {
+        CharSequence        name;
+        int                 importance;
+        NotificationChannel channel;
+        NotificationManager notificationManager;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            name                = getString(R.string.app_name);
+            importance          = NotificationManager.IMPORTANCE_DEFAULT;
+            channel             = new NotificationChannel(getString(R.string.app_name), name, importance);
+            notificationManager = getActivity().getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
+    }
+
+    /**
+     * Gets the list to be shared and starts the share intent
+     */
+    private void startShareIntent() {
+        Intent shareIntent;
+        String listToShare;
+
+        shareIntent = new Intent();
+        shareIntent.setAction(Intent.ACTION_SEND);
+
+        listToShare = getListToShare();
+
+        shareIntent.putExtra(Intent.EXTRA_TEXT, listToShare);
+        shareIntent.setType("text/plain");
+        startActivity(shareIntent);
     }
 
     /**
@@ -148,7 +189,7 @@ public class FragmentHave extends Fragment {
         cardsToShare += System.lineSeparator();
         cardsToShare += "Tenho";
 
-        for (HaveCard card : have_cards_list) {
+        for (HaveCard card : haveCardsList) {
             cardsToShare += System.lineSeparator();
             cardsToShare += card.getQuantity() + "x " + card.getName_pt();
         }
@@ -160,26 +201,27 @@ public class FragmentHave extends Fragment {
     /**
      * Reloads the data and refreshes the view.
      */
-    public void refreshRecyclerView() {
+    public void refreshRecyclerView(boolean updateCardsList) {
         RecyclerView.Adapter haveAdapter;
 
         // Get the list of have cards from the db
-        getHaveCards();
+        if (updateCardsList)
+            getHaveCards();
 
         // Shows or hides the no cards message
-        if (have_cards_list.isEmpty()) {
+        if (haveCardsList.isEmpty()) {
             recyclerView.setVisibility(View.GONE);
-            no_cards_message.setVisibility(View.VISIBLE);
+            mNoCardsMessage.setVisibility(View.VISIBLE);
         } else {
             recyclerView.setVisibility(View.VISIBLE);
-            no_cards_message.setVisibility(View.GONE);
+            mNoCardsMessage.setVisibility(View.GONE);
         }
 
         // Sets up the recycler view with the list of cards
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(fragment_activity);
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(fragmentActivity);
         recyclerView.setLayoutManager(layoutManager);
 
-        haveAdapter = new HaveAdapter(fragment_activity, have_cards_list);
+        haveAdapter = new HaveAdapter(fragmentActivity, haveCardsList);
         haveAdapter.notifyDataSetChanged();
         recyclerView.invalidate();
         recyclerView.setAdapter(haveAdapter);
@@ -190,15 +232,15 @@ public class FragmentHave extends Fragment {
      * Shows the confirmation dialog
      */
     public void deleteConfirmDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(fragment_activity, R.style.exclusionConfirmationDialog);
+        AlertDialog.Builder builder = new AlertDialog.Builder(fragmentActivity, R.style.exclusionConfirmationDialog);
         builder
                 .setMessage(getString(R.string.delete_confirmation))
                 .setTitle(getString(R.string.atention))
                 .setPositiveButton(getString(R.string.yes), (dialog, id) -> {
-                    DatabaseHelper dbHelper = DatabaseHelper.getInstance(fragment_activity);
-                    dbHelper.deleteHaveCard(context_menu_card_id);
-                    refreshRecyclerView();
-                    Toast.makeText(fragment_activity, R.string.delete_successful, Toast.LENGTH_SHORT).show();
+                    DatabaseHelper dbHelper = DatabaseHelper.getInstance(fragmentActivity);
+                    dbHelper.deleteHaveCard(contextMenuCardId);
+                    refreshRecyclerView(true);
+                    Toast.makeText(fragmentActivity, R.string.delete_successful, Toast.LENGTH_SHORT).show();
                 })
                 .setNegativeButton(getString(R.string.no), (dialog, id) -> {
                     dialog.cancel();
