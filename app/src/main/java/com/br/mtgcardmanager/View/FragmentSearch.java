@@ -27,7 +27,7 @@ import com.android.volley.toolbox.Volley;
 import com.br.mtgcardmanager.Adapter.EditionsDialogAdapter;
 import com.br.mtgcardmanager.Helper.DatabaseHelper;
 import com.br.mtgcardmanager.Helper.UtilsHelper;
-import com.br.mtgcardmanager.Model.Editions;
+import com.br.mtgcardmanager.Model.Edition;
 import com.br.mtgcardmanager.Model.HaveCard;
 import com.br.mtgcardmanager.Model.WantCard;
 import com.br.mtgcardmanager.R;
@@ -44,34 +44,35 @@ import java.util.ArrayList;
  * A simple {@link Fragment} subclass.
  */
 public class FragmentSearch extends Fragment implements View.OnClickListener, AdapterView.OnItemClickListener {
-    private static ArrayList<Editions> cardEditions;
-    private static Elements            cardNamePT;
-    private static Elements            cardNameEN;
-    private Editions                   edition;
-    private HaveCard haveCard = new HaveCard();
-    private WantCard wantCard = new WantCard();
-    private String                     foil;
-    Boolean               secondRequest;
-    Boolean               longPress;
-    Boolean               btn_have_pressed;
-    Boolean               btn_want_pressed;
-    Button                buttonHave;
-    Button                buttonWant;
-    DatabaseHelper        dbHelper;
-    Dialog                dialog;
-    Document              doc;
-    Elements              pageTitle;
-    EditionsDialogAdapter editionsAdapter;
-    ListView              editionsListView;
-    ProgressDialog        progressDialog;
-    RequestQueue          queue;
-    String                searchedCard;
-    String                url;
-    String                title = "";
-    String                selectedEdition;
-    StringRequest         stringRequest;
-    View                  fragSearchView;
-    UtilsHelper           utils;
+    private static ArrayList<Edition> cardEditions;
+    private ArrayList<Edition>        availableEditions;
+    private static Elements           cardNamePT;
+    private static Elements           cardNameEN;
+    private Edition                   edition;
+    private HaveCard                  haveCard = new HaveCard();
+    private WantCard                  wantCard = new WantCard();
+    private String                    foil;
+    public  Boolean                   secondRequest;
+    public  Boolean                   longPress;
+    public  Boolean                   btn_have_pressed;
+    public  Boolean                   btn_want_pressed;
+    public  Button                    buttonHave;
+    public  Button                    buttonWant;
+    public  DatabaseHelper            dbHelper;
+    public  Dialog                    dialog;
+    public  Document                  doc;
+    public  Elements                  pageTitle;
+    public  EditionsDialogAdapter     editionsAdapter;
+    public  ListView                  editionsListView;
+    public  ProgressDialog            progressDialog;
+    public  RequestQueue              queue;
+    public  String                    searchedCard;
+    public  String                    url;
+    public  String                    title = "";
+    public  String                    selectedEdition;
+    public  StringRequest             stringRequest;
+    public  View                      fragSearchView;
+    public  UtilsHelper               utils;
 
     public FragmentSearch() {
         // Required empty public constructor
@@ -131,12 +132,10 @@ public class FragmentSearch extends Fragment implements View.OnClickListener, Ad
      * @param query
      */
     public void searchLigaMagic(final Activity activity, final String query) {
-//        TableLayout     tableLayout = activity.findViewById(R.id.tableLayoutID);
         final ImageView mCardImage  = activity.findViewById(R.id.ivCardImageID);
         final TextView  mCardNamePT = activity.findViewById(R.id.cardNameID);
         final TextView  mCardNameEN = activity.findViewById(R.id.cardNameEN);
 
-//        tableLayout.removeAllViews();
         progressDialog = new ProgressDialog(activity, R.style.customProgressDialog);
         progressDialog.setMessage(activity.getString(R.string.loading));
         progressDialog.show();
@@ -145,6 +144,12 @@ public class FragmentSearch extends Fragment implements View.OnClickListener, Ad
         searchedCard = query.replace(" ", "+");
         url          = "https://www.ligamagic.com.br/?view=cards%2Fsearch&card=" + searchedCard;
         cardEditions = new ArrayList<>();
+
+        if (dbHelper == null)
+            dbHelper  = DatabaseHelper.getInstance(this.getContext());
+
+        if (availableEditions == null || availableEditions.size() == 0)
+            availableEditions = dbHelper.getAllEditions();
 
         // Request a string response from the provided URL.
         stringRequest = new StringRequest(Request.Method.GET, url,
@@ -213,10 +218,11 @@ public class FragmentSearch extends Fragment implements View.OnClickListener, Ad
         TextView mTvMinPrice;
         TextView mTvMaxPrice;
         Elements imgSpan;
+        Elements htmlEditionsNames;
+        Elements htmlDivPrecos;
         String   cardImgURL;
-//        String   cardNameFull;
-//        Elements hmtlUl;
-//        Elements htmlLi;
+        String   menorPreco;
+        String   maiorPreco;
 
         mBtnHaveAdd = activity.findViewById(R.id.btn_tenho);
         mBtnWantAdd = activity.findViewById(R.id.btn_quero);
@@ -241,126 +247,45 @@ public class FragmentSearch extends Fragment implements View.OnClickListener, Ad
         cardNamePT = doc.select("div[id=card-sm-name]").select("p[class=nome-principal]");
         cardNameEN = doc.select("div[id=card-sm-name]").select("p[class=nome-auxiliar]");
 
-//        if (cardNameEN.size() > 0)
-//            cardNameFull = cardNamePT.get(0).text() + " | " + cardNameEN.get(0).text();
-//        else
-//            cardNameFull = cardNamePT.get(0).text();
         mCardNamePT.setText(cardNamePT.get(0).text());
         mCardNameEN.setText(cardNameEN.get(0).text());
 
-//        TableLayout layout = activity.findViewById(R.id.tableLayoutID);
-//        TableLayout.LayoutParams tableParams = new TableLayout.LayoutParams(
-//                TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.MATCH_PARENT);
-//        TableRow.LayoutParams rowParams = new TableRow.LayoutParams(
-//                TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
-//        TableLayout tblLayout = new TableLayout(activity.getApplicationContext());
-//        tblLayout.setLayoutParams(tableParams);
-
-//        TableRow rowPrices = new TableRow(activity.getApplicationContext());
-//        rowPrices.setLayoutParams(rowParams);
-//        TextView textViewPrices = new TextView(activity.getApplicationContext());
-//        textViewPrices.setTextSize(18);
-//        textViewPrices.setTextColor(activity.getResources().getColor(R.color.colorPrimary));
-////        textViewPrices.setText(getString(R.string.prices));
-//        textViewPrices.setText("Precos");
-//        textViewPrices.setTypeface(null, Typeface.BOLD);
-//        rowPrices.addView(textViewPrices);
-//        layout.addView(rowPrices);
-
-//        hmtlUl = doc.select("div[class=bloco-edicoes]");
-//        htmlLi = hmtlUl.select("li");
-
-        Elements htmlEditionsNames = doc.select("div[id=card-filtros]")
+        htmlEditionsNames = doc.select("div[id=card-filtros]")
                 .select("div:last-child[class=filtro]").select("div[class=filtro-opcao]");
 
-//        for (int i = 0; i < htmlLi.size(); i++) {
         for (int i = 0; i < htmlEditionsNames.size(); i++) {
-            ImageView mImageView = new ImageView(activity.getApplicationContext());
+            ImageView mImageView;
+            String    aux;
+
+            mImageView = new ImageView(activity.getApplicationContext());
             mImageView.setAdjustViewBounds(true);
 
             // create the list of editions the card appeared in
-            edition = new Editions();
+            edition = new Edition();
 
-//            edition.setEdition(htmlLi.get(i).select("img").attr("title"));
-            String aux = htmlEditionsNames.get(i).text();
+            aux = htmlEditionsNames.get(i).text();
             if (aux.contains(")"))
                 aux = aux.substring(aux.indexOf(")") +1).trim();
 
-            edition.setEdition(aux);
-            cardEditions.add(edition);
+            for (Edition ed : availableEditions) {
+                if (ed.getEdition().equalsIgnoreCase(aux) || ed.getEdition_pt().equalsIgnoreCase(aux)) {
+                    edition.setEdition(aux);
+                    cardEditions.add(edition);
+                }
+            }
+        }
 
-//            String editionIcon    = htmlLi.get(i).select("img").attr("src");
-//            String cardEditionURL = "https:" + editionIcon;
-//            mImageView.setPadding(0, 0, 10, 0);
-//            Picasso.with(activity.getBaseContext())
-//                    .load(cardEditionURL)
-////                    .resize(mImageView.getWidth(), 35)
-//                    .into(mImageView);
-
-
-//            Elements htmlDivPrecos = doc.select("div[class=precos-edicoes]");
-//
-//            Elements htmlCols = htmlDivPrecos.select("div:not([class=precos-edicoes])");
-//            for (int j = 0; j < htmlCols.size(); j++) {
-//                TableRow row = new TableRow(activity.getApplicationContext());
-//                TextView textView = new TextView(activity.getApplicationContext());
-//                textView.setTextSize(14);
-//                textView.setTextColor(Color.BLACK);
-//                row.setLayoutParams(rowParams);
-//                if (htmlCols.get(j).attr("class").equals("precos-menor")) {
-//                    textView.setText(activity.getString(R.string.min) + " " + htmlCols.get(j).text());
-//                    textView.setTypeface(null, Typeface.BOLD);
-//                    row.addView(mImageView); //adiciona o ícone da edição ao layout
-//                    row.addView(textView); //adiciona o menor preço ao layout
-//                } else if (htmlCols.get(j).attr("class").equals("precos-medio")) {
-//                    TextView tvColumn1 = new TextView(activity.getApplicationContext());
-//                    textView.setText(activity.getString(R.string.avg) + " " + htmlCols.get(j).text());
-//                    row.addView(tvColumn1);
-//                    row.addView(textView);
-//                } else if (htmlCols.get(j).attr("class").equals("precos-maior")) {
-//                    TextView tvColumn1 = new TextView(activity.getApplicationContext());
-//                    textView.setText(activity.getString(R.string.max) + " " + htmlCols.get(j).text());
-//                    row.addView(tvColumn1);
-//                    row.addView(textView);
-//                    row.setPadding(0, 0, 0, 20);
-//                }//end else if
-//                layout.addView(row);
-//            }//end for j
-        }//end for i
-
-        Elements htmlDivPrecos = doc.select("div[id=alerta-preco]");
-        String menorPreco = htmlDivPrecos.select("div[class=col-xl-6 col-6 b preco-menor]").select("font[class=bigger]").html();
-        String maiorPreco = htmlDivPrecos.select("div[class=col-xl-6 col-6 b preco-maior]").select("font[class=bigger]").html();
+        htmlDivPrecos = doc.select("div[id=alerta-preco]");
+        menorPreco    = htmlDivPrecos.select("div[class=col-xl-6 col-6 b preco-menor]").select("font[class=bigger]").html();
+        maiorPreco    = htmlDivPrecos.select("div[class=col-xl-6 col-6 b preco-maior]").select("font[class=bigger]").html();
 
         mTvMinPrice.setText(activity.getResources().getString(R.string.min) + " R$ " + menorPreco);
         mTvMinPrice.setTextSize(16);
         mTvMaxPrice.setText(activity.getResources().getString(R.string.max) + " R$ " + maiorPreco);
         mTvMaxPrice.setTextSize(16);
 
-//        TableRow row = new TableRow(activity.getApplicationContext());
-//        row.setLayoutParams(rowParams);
-//        TextView textView = new TextView(activity.getApplicationContext());
-//        textView.setTextSize(14);
-//        textView.setTextColor(Color.BLACK);
-//
-//        textView.setText(activity.getString(R.string.min) + " R$ " + menorPreco);
-//        textView.setTypeface(null, Typeface.BOLD);
-//        row.addView(textView);
-//        layout.addView(row);
-//
-//        row = new TableRow(activity.getApplicationContext());
-//        row.setLayoutParams(rowParams);
-//        textView = new TextView(activity.getApplicationContext());
-//        textView.setTextSize(14);
-//        textView.setTextColor(Color.BLACK);
-//
-//        textView.setText(activity.getString(R.string.max) + " R$ " + maiorPreco);
-//        row.addView(textView);
-//        layout.addView(row);
-
         progressDialog.dismiss();
-    }//end montarLayout
-
+    }
 
     // Listeners for buttons HAVE and WANT
     public void onClick(View view){
@@ -419,7 +344,7 @@ public class FragmentSearch extends Fragment implements View.OnClickListener, Ad
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        edition         = (Editions) editionsListView.getItemAtPosition(position);
+        edition         = (Edition) editionsListView.getItemAtPosition(position);
         selectedEdition = edition.getEdition();
 
         dialog.cancel();

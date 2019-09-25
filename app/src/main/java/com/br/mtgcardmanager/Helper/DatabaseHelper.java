@@ -8,7 +8,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import com.br.mtgcardmanager.DAO.EditionDAO;
 import com.br.mtgcardmanager.DAO.HaveDAO;
 import com.br.mtgcardmanager.DAO.WantDAO;
-import com.br.mtgcardmanager.Model.Editions;
+import com.br.mtgcardmanager.Model.Edition;
 import com.br.mtgcardmanager.Model.HaveCard;
 import com.br.mtgcardmanager.Model.WantCard;
 
@@ -18,32 +18,32 @@ import java.util.ArrayList;
  * Created by Bruno on 23/07/2016.
  */
 public class DatabaseHelper extends SQLiteOpenHelper {
-    public               ArrayList<Editions> currentEditions;
-    public               long                editionsCount;
-    public               long                card_id;
-    public static        SQLiteDatabase      db;
-    private static       DatabaseHelper      sInstance;
-    public static  final String              LOG = "DatabaseHelper";
-    private static final int                 DATABASE_VERSION = 1;
-    public static  final String              DATABASE_NAME     = "mtgCardManager";
+    public               ArrayList<Edition> currentEditions;
+    public               long               editionsCount;
+    public               long               card_id;
+    public static        SQLiteDatabase     db;
+    private static       DatabaseHelper     sInstance;
+    public static  final String             LOG = "DatabaseHelper";
+    private static final int                DATABASE_VERSION = 1;
+    public static  final String             DATABASE_NAME     = "mtgCardManager";
 
     //Table names
-    public static  final String              TABLE_HAVE        = "have";
-    public static  final String              TABLE_WANT        = "want";
-    public static  final String              TABLE_EDITIONS    = "editions";
+    public static  final String             TABLE_HAVE        = "have";
+    public static  final String             TABLE_WANT        = "want";
+    public static  final String             TABLE_EDITIONS    = "editions";
 
     //Commom column names
-    public static  final String              KEY_ID            = "id";
-    public static  final String              KEY_NAME_EN       = "name_en";
-    public static  final String              KEY_NAME_PT       = "name_pt";
-    public static  final String              KEY_ID_EDITION    = "id_edition";
-    public static  final String              KEY_QUANTITY      = "quantity";
-    public static  final String              KEY_FOIL          = "foil";
+    public static  final String             KEY_ID            = "id";
+    public static  final String             KEY_NAME_EN       = "name_en";
+    public static  final String             KEY_NAME_PT       = "name_pt";
+    public static  final String             KEY_ID_EDITION    = "id_edition";
+    public static  final String             KEY_QUANTITY      = "quantity";
+    public static  final String             KEY_FOIL          = "foil";
 
     //EDITIONS Table - specific column names
-    public static  final String              KEY_EDITION_SHORT = "edition_short";
-    public static  final String              KEY_EDITION       = "edition";
-    public static  final String              KEY_EDITION_PT    = "edition_pt";
+    public static  final String             KEY_EDITION_SHORT = "edition_short";
+    public static  final String             KEY_EDITION       = "edition";
+    public static  final String             KEY_EDITION_PT    = "edition_pt";
 
 
     public DatabaseHelper(Context context) {
@@ -209,6 +209,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     //********************************
     //*** EDITIONS Table functions ***
     //********************************
+    public ArrayList<Edition> getAllEditions(){
+        db                    = this.getReadableDatabase();
+        EditionDAO editionDAO = new EditionDAO();
+
+        return editionDAO.getAllEditions(db);
+    }
+
     public Long getEditionsQty(){
         db = this.getReadableDatabase();
         EditionDAO editionDAO = new EditionDAO();
@@ -216,7 +223,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return editionDAO.getEditionsQty(db);
     }
 
-    public Editions getSingleEdition(Context context, String selectedEdition) {
+    public Edition getSingleEdition(Context context, String selectedEdition) {
         db                    = this.getReadableDatabase();
         EditionDAO editionDAO = new EditionDAO();
 
@@ -237,7 +244,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return editionDAO.getEditionById(db, context, edition_id);
     }
 
-    public ArrayList<Editions> populateEditionsList() {
+    public ArrayList<Edition> populateEditionsList() {
         EditionDAO editionDAO = new EditionDAO();
 
         currentEditions = editionDAO.populateEditionsList();

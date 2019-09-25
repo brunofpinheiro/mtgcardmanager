@@ -3,24 +3,24 @@ package com.br.mtgcardmanager.Model;
 /**
  * Created by Bruno on 21/07/2016.
  */
-public class Editions {
+public class Edition {
     int    id;
     String edition_short;
     String edition;
     String edition_pt;
 
     // constructors
-    public Editions(){
+    public Edition(){
 
     }
 
-    public Editions(String edition_short, String edition, String edition_pt){
+    public Edition(String edition_short, String edition, String edition_pt){
         this.edition_short = edition_short;
         this.edition       = edition;
         this.edition_pt    = edition_pt;
     }
 
-    public Editions(int id, String edition_short, String edition, String edition_pt){
+    public Edition(int id, String edition_short, String edition, String edition_pt){
         this.id         = id;
         this.edition_short = edition_short;
         this.edition       = edition;

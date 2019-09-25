@@ -19,27 +19,33 @@ import java.util.ArrayList;
  * Created by Bruno on 21/07/2016.
  */
 public class HaveAdapter extends RecyclerView.Adapter<HaveViewHolder> {
-    private Context              context;
-    private ArrayList<HaveCard> have_cards;
+    private Context             context;
+    private ArrayList<HaveCard> haveCards;
 
-    public HaveAdapter (Context context, ArrayList<HaveCard> have_cards){
-        this.context    = context;
-        this.have_cards = have_cards;
+    public HaveAdapter (Context context, ArrayList<HaveCard> haveCards){
+        this.context   = context;
+        this.haveCards = haveCards;
     }
 
     //Create new views (invoked by the layout manager)
     @Override
-    public HaveViewHolder onCreateViewHolder(ViewGroup parent, int viewType){
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.recycler_view_have, parent, false);
-        HaveViewHolder viewHolder = new HaveViewHolder(context, view);
+    public HaveViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View           view;
+        HaveViewHolder viewHolder;
+
+        view       = LayoutInflater.from(parent.getContext()).inflate(R.layout.recycler_view_have, parent, false);
+        viewHolder = new HaveViewHolder(context, view);
         return viewHolder;
     }
 
     //Replace the contents of a view (invoked by the layout manager)
     @Override
     public void onBindViewHolder (final HaveViewHolder viewHolder, int position) {
-        DatabaseHelper  dbHelper = new DatabaseHelper(context);
-        final HaveCard card = have_cards.get(position);
+        DatabaseHelper  dbHelper;
+        final HaveCard  card;
+
+        dbHelper = new DatabaseHelper(context);
+        card     = haveCards.get(position);
 
         if (card.getName_en().isEmpty()) {
             viewHolder.mCardName.setText(card.getName_pt());
@@ -55,14 +61,16 @@ public class HaveAdapter extends RecyclerView.Adapter<HaveViewHolder> {
         viewHolder.setLongClickListener(new LongClickListener() {
             @Override
             public void onItemLongClick(int position) {
-                FragmentHave fragment_have = new FragmentHave();
-                fragment_have.getLongPressedItem(card);
+                FragmentHave fragmentHave;
+
+                fragmentHave = new FragmentHave();
+                fragmentHave.getLongPressedItem(card);
             }
         });
     }
 
     @Override
     public int getItemCount(){
-        return have_cards.size();
+        return haveCards.size();
     }
 }

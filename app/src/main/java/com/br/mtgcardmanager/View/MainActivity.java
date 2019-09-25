@@ -15,8 +15,6 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 
 import com.br.mtgcardmanager.Adapter.PagerAdapter;
@@ -44,6 +42,7 @@ import com.google.api.services.drive.DriveScopes;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 import retrofit2.Call;
@@ -54,25 +53,25 @@ import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
 
-    private       FragmentSearch                fragmentSearch;
-    private       DatabaseHelper                dbHelper;
-    private       ViewPager                     viewPager;
-    private       List<String>                  jsonCardsList = new ArrayList<>();
-    private       MenuItem                      searchMenu;
-    private       AdView                        mAdView;
-    public static boolean                       running = false;
-    private       SearchView.SearchAutoComplete searchAutoComplete;
-    private       Call<APICard>                 call = null;
-    private       ArrayAdapter<String>          adapter = null;
-    private       SearchView                    searchView = null;
-    private       DriveBackupService            driveBackupService;
-    private       GoogleSignInClient            client;
-    private       GoogleAccountCredential       credential;
-    private static final String                 TAG = "MainActivity";
-    private static final int                    REQUEST_CODE_SIGN_IN = 1;
-    private static final int                    REQUEST_CODE_UPLOAD_BACKUP = 2;
-    private static final int                    REQUEST_CODE_DOWNLOAD_BACKUP = 3;
-    private ProgressDialog                      progressDialog;
+    private              FragmentSearch                fragmentSearch;
+    private              DatabaseHelper                dbHelper;
+    private              ViewPager                     viewPager;
+    private              List<String>                  jsonCardsList = new ArrayList<>();
+    private              MenuItem                      searchMenu;
+    private              AdView                        mAdView;
+    public static        boolean                       running = false;
+    private              SearchView.SearchAutoComplete searchAutoComplete;
+    private              Call<APICard>                 call = null;
+    private              ArrayAdapter<String>          adapter = null;
+    private              SearchView                    searchView = null;
+    private              DriveBackupService            driveBackupService;
+    private              GoogleSignInClient            client;
+    private              GoogleAccountCredential       credential;
+    private static final String                        TAG = "MainActivity";
+    private static final int                           REQUEST_CODE_SIGN_IN = 1;
+    private static final int                           REQUEST_CODE_UPLOAD_BACKUP = 2;
+    private static final int                           REQUEST_CODE_DOWNLOAD_BACKUP = 3;
+    private              ProgressDialog                progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -187,34 +186,40 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
 
-        searchMenu = menu.findItem(R.id.search);
-        searchView = (SearchView) MenuItemCompat.getActionView(searchMenu);
+        searchMenu         = menu.findItem(R.id.search);
+        searchView         = (SearchView) MenuItemCompat.getActionView(searchMenu);
         searchAutoComplete = searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
         searchAutoComplete.setTextColor(Color.WHITE);
-        searchAutoComplete.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String query = (String) parent.getItemAtPosition(position);
-                searchCard(query);
-            }
+        searchAutoComplete.setOnItemClickListener((parent, view, position, id) -> {
+            String query = (String) parent.getItemAtPosition(position);
+            searchCard(query);
         });
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                searchCard(query);
-                return false;
+                if (viewPager.getCurrentItem() == 0) {
+                    filterCardList("have", query);
+                } else if (viewPager.getCurrentItem() == 1) {
+                    searchCard(query);
+                } else if (viewPager.getCurrentItem() == 2) {
+                    filterCardList("want", query);
+                }
+
+                return true;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                System.out.println("onQueryTextChange: " + newText);
-                if (newText.length() > 2) {
-                    if (call != null && call.isExecuted()) {
-                        call.cancel();
+                if (viewPager.getCurrentItem() == 1) {
+                    if (newText.length() > 2) {
+                        if (call != null && call.isExecuted()) {
+                            call.cancel();
+                        }
+                        apiSearchByName(newText);
                     }
-                    apiSearchByName(newText);
                 }
+
                 return true;
             }
         });
@@ -239,10 +244,48 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    private void filterCardList(String fragmentName, String query) {
+        if (fragmentName.equalsIgnoreCase("have")) {
+            FragmentHave fragmentHave = new FragmentHave();
+            fragmentHave.getHaveCards();
+
+            HaveCard current = new HaveCard();
+
+            for (Iterator<HaveCard> it = fragmentHave.haveCardsList.iterator(); it.hasNext();) {
+                if (it.hasNext())
+                    current = it.next();
+
+                if (!current.getName_en().toLowerCase().contains(query.toLowerCase())
+                        && !current.getName_pt().toLowerCase().contains(query.toLowerCase()))
+                    it.remove();
+            }
+            fragmentHave.refreshRecyclerView(false);
+        } else if (fragmentName.equalsIgnoreCase("want")) {
+            FragmentWant fragmentWant = new FragmentWant();
+            fragmentWant.getWantCards();
+
+            WantCard current = new WantCard();
+
+            for (Iterator<WantCard> it = fragmentWant.wantCardsList.iterator(); it.hasNext();) {
+                if (it.hasNext())
+                    current = it.next();
+
+                if (!current.getName_en().toLowerCase().contains(query)
+                        && !current.getName_pt().toLowerCase().contains(query))
+                    it.remove();
+            }
+            fragmentWant.refreshRecyclerView(false);
+        }
+
+        MenuItemCompat.collapseActionView(searchMenu); //hides the menu search field
+        searchAutoComplete.dismissDropDown();
+
+    }
+
 
     public void searchCard(String query) {
         fragmentSearch = new FragmentSearch();
-        MenuItemCompat.collapseActionView(searchMenu); //recolhe o campo de busca do menu
+        MenuItemCompat.collapseActionView(searchMenu); //hides the menu search field
         searchAutoComplete.dismissDropDown();
 
         // If not in Tab Search, then go to Tab Search

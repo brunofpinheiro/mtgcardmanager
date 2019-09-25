@@ -27,6 +27,7 @@
     <string name="prices">Preços</string>
     <string name="pt_br">portuguese (brazil)</string>
     <string name="action_backup">Iniciar backup</string>
+    <string name="atention">Atenção!</string>
 
     <!--MESSAGES-->
     <string name="search_failed">Falha na consulta. Tente novamente.</string>
@@ -41,7 +42,6 @@
     <string name="backup_completed">Backup concluído!</string>
     <string name="backup_failure">Não consegui restaurar o backup. Feche e abra o aplicativo novamente.</string>
     <string name="backup_found">Encontrei um backup dos seus dados. Deseja restaura-los?</string>
-    <string name="atention">Atenção!</string>
     <string name="backup_in_progress">Backup em andamento…</string>
     <string name="restoring_backup">Restaurando o backup…</string>
 
