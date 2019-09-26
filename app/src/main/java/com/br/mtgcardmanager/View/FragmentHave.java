@@ -22,7 +22,7 @@ import android.widget.Toast;
 
 import com.br.mtgcardmanager.Adapter.HaveAdapter;
 import com.br.mtgcardmanager.Helper.DatabaseHelper;
-import com.br.mtgcardmanager.Model.HaveCard;
+import com.br.mtgcardmanager.Model.Card;
 import com.br.mtgcardmanager.R;
 
 import java.util.ArrayList;
@@ -32,15 +32,15 @@ import java.util.ArrayList;
  * A simple {@link Fragment} subclass.
  */
 public class FragmentHave extends Fragment {
-    private static RecyclerView        recyclerView;
-    private static FragmentActivity    fragmentActivity;
-    private static TextView            mNoCardsMessage;
-    public         ArrayList<HaveCard> haveCardsList;
-    public  static int                 contextMenuCardId;
-    public  static String              contextMenuNameEn;
-    public  static String              contextMenuNamePt;
-    public  static String              contextMenuFoil;
-    private        int                 notificationNumber;
+    private static RecyclerView     recyclerView;
+    private static FragmentActivity fragmentActivity;
+    private static TextView         mNoCardsMessage;
+    public         ArrayList<Card>  haveCardsList;
+    public  static int              contextMenuCardId;
+    public  static String           contextMenuNameEn;
+    public  static String           contextMenuNamePt;
+    public  static String           contextMenuFoil;
+    private        int              notificationNumber;
 
 
     public FragmentHave() {
@@ -78,7 +78,7 @@ public class FragmentHave extends Fragment {
      * Get the properties of a long pressed item.
      * @param card
      */
-    public void getLongPressedItem(HaveCard card) {
+    public void getLongPressedItem(Card card) {
         contextMenuCardId = card.getId();
         contextMenuNameEn = card.getName_en();
         contextMenuNamePt = card.getName_pt();
@@ -189,7 +189,7 @@ public class FragmentHave extends Fragment {
         cardsToShare += System.lineSeparator();
         cardsToShare += "Tenho";
 
-        for (HaveCard card : haveCardsList) {
+        for (Card card : haveCardsList) {
             cardsToShare += System.lineSeparator();
             cardsToShare += card.getQuantity() + "x " + card.getName_pt();
         }

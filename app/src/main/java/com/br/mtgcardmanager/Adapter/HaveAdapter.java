@@ -6,11 +6,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.br.mtgcardmanager.Model.Card;
 import com.br.mtgcardmanager.View.FragmentHave;
 import com.br.mtgcardmanager.View.HaveViewHolder;
 import com.br.mtgcardmanager.Helper.DatabaseHelper;
 import com.br.mtgcardmanager.LongClickListener;
-import com.br.mtgcardmanager.Model.HaveCard;
 import com.br.mtgcardmanager.R;
 
 import java.util.ArrayList;
@@ -19,10 +19,10 @@ import java.util.ArrayList;
  * Created by Bruno on 21/07/2016.
  */
 public class HaveAdapter extends RecyclerView.Adapter<HaveViewHolder> {
-    private Context             context;
-    private ArrayList<HaveCard> haveCards;
+    private Context         context;
+    private ArrayList<Card> haveCards;
 
-    public HaveAdapter (Context context, ArrayList<HaveCard> haveCards){
+    public HaveAdapter (Context context, ArrayList<Card> haveCards){
         this.context   = context;
         this.haveCards = haveCards;
     }
@@ -41,8 +41,8 @@ public class HaveAdapter extends RecyclerView.Adapter<HaveViewHolder> {
     //Replace the contents of a view (invoked by the layout manager)
     @Override
     public void onBindViewHolder (final HaveViewHolder viewHolder, int position) {
-        DatabaseHelper  dbHelper;
-        final HaveCard  card;
+        DatabaseHelper dbHelper;
+        final Card     card;
 
         dbHelper = new DatabaseHelper(context);
         card     = haveCards.get(position);

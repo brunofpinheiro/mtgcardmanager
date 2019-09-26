@@ -8,9 +8,8 @@ import android.database.sqlite.SQLiteOpenHelper;
 import com.br.mtgcardmanager.DAO.EditionDAO;
 import com.br.mtgcardmanager.DAO.HaveDAO;
 import com.br.mtgcardmanager.DAO.WantDAO;
+import com.br.mtgcardmanager.Model.Card;
 import com.br.mtgcardmanager.Model.Edition;
-import com.br.mtgcardmanager.Model.HaveCard;
-import com.br.mtgcardmanager.Model.WantCard;
 
 import java.util.ArrayList;
 
@@ -123,16 +122,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     //********************************
     //***** HAVE Table functions *****
     //********************************
-    public Long insertHaveCard(HaveCard haveCard){
+    public Long insertHaveCard(Card card){
         db              = this.getWritableDatabase();
         HaveDAO haveDAO = new HaveDAO();
 
-        card_id = haveDAO.insertHaveCard(db, haveCard);
+        card_id = haveDAO.insertHaveCard(db, card);
 
         return card_id;
     }
 
-    public ArrayList<HaveCard> getAllHaveCards(){
+    public ArrayList<Card> getAllHaveCards(){
         db              = getReadableDatabase();
         HaveDAO haveDAO = new HaveDAO();
 
@@ -146,7 +145,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         haveDAO.deleteHaveCard(db, id_have_card);
     }
 
-    public HaveCard checkIfHaveCardExists(String name_en, int id_edition, String foil){
+    public Card checkIfHaveCardExists(String name_en, int id_edition, String foil){
         db              = this.getReadableDatabase();
         HaveDAO haveDAO = new HaveDAO();
 
@@ -157,16 +156,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     //********************************
     //***** WANT Table functions *****
     //********************************
-    public Long insertWantCard(WantCard wantCard){
+    public Long insertWantCard(Card card){
         db              = this.getWritableDatabase();
         WantDAO wantDAO = new WantDAO();
 
-        card_id = wantDAO.insertWantCard(db, wantCard);
+        card_id = wantDAO.insertWantCard(db, card);
 
         return card_id;
     }
 
-    public ArrayList<WantCard> getAllWantCards(){
+    public ArrayList<Card> getAllWantCards(){
         db              = getReadableDatabase();
         WantDAO wantDAO = new WantDAO();
 
@@ -180,7 +179,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         wantDAO.deleteWantCard(db, id_want_card);
     }
 
-    public WantCard checkIfWantCardExists(String name_en, int id_edition, String foil){
+    public Card checkIfWantCardExists(String name_en, int id_edition, String foil){
         db              = this.getReadableDatabase();
         WantDAO wantDAO = new WantDAO();
 

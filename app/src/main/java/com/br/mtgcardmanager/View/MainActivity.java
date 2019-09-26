@@ -20,9 +20,8 @@ import android.widget.ArrayAdapter;
 import com.br.mtgcardmanager.Adapter.PagerAdapter;
 import com.br.mtgcardmanager.DriveBackupService;
 import com.br.mtgcardmanager.Helper.DatabaseHelper;
-import com.br.mtgcardmanager.Model.APICard;
-import com.br.mtgcardmanager.Model.HaveCard;
-import com.br.mtgcardmanager.Model.WantCard;
+import com.br.mtgcardmanager.Model.APICards;
+import com.br.mtgcardmanager.Model.Card;
 import com.br.mtgcardmanager.Network.GetDataService;
 import com.br.mtgcardmanager.Network.RetrofitClientInstance;
 import com.br.mtgcardmanager.R;
@@ -61,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
     private              AdView                        mAdView;
     public static        boolean                       running = false;
     private              SearchView.SearchAutoComplete searchAutoComplete;
-    private              Call<APICard>                 call = null;
+    private              Call<APICards>                 call = null;
     private              ArrayAdapter<String>          adapter = null;
     private              SearchView                    searchView = null;
     private              DriveBackupService            driveBackupService;
@@ -249,9 +248,9 @@ public class MainActivity extends AppCompatActivity {
             FragmentHave fragmentHave = new FragmentHave();
             fragmentHave.getHaveCards();
 
-            HaveCard current = new HaveCard();
+            Card current = new Card();
 
-            for (Iterator<HaveCard> it = fragmentHave.haveCardsList.iterator(); it.hasNext();) {
+            for (Iterator<Card> it = fragmentHave.haveCardsList.iterator(); it.hasNext();) {
                 if (it.hasNext())
                     current = it.next();
 
@@ -264,9 +263,9 @@ public class MainActivity extends AppCompatActivity {
             FragmentWant fragmentWant = new FragmentWant();
             fragmentWant.getWantCards();
 
-            WantCard current = new WantCard();
+            Card current = new Card();
 
-            for (Iterator<WantCard> it = fragmentWant.wantCardsList.iterator(); it.hasNext();) {
+            for (Iterator<Card> it = fragmentWant.wantCardsList.iterator(); it.hasNext();) {
                 if (it.hasNext())
                     current = it.next();
 
@@ -306,21 +305,21 @@ public class MainActivity extends AppCompatActivity {
         GetDataService service = RetrofitClientInstance.getRetrofitInstance().create(GetDataService.class);
         call = service.getCardsByName(name, getString(R.string.pt_br), 10);
 
-        call.enqueue(new Callback<APICard>() {
+        call.enqueue(new Callback<APICards>() {
             @Override
-            public void onResponse(Call<APICard> call, Response<APICard> response) {
-                List<APICard> returnedCards = new ArrayList<>();
+            public void onResponse(Call<APICards> call, Response<APICards> response) {
+                List<APICards> returnedCards = new ArrayList<>();
                 jsonCardsList = new ArrayList<>();
                 int cardsQty;
 
                 returnedCards.add(response.body());
-                APICard apiCard = returnedCards.get(0);
-                cardsQty = apiCard.getCards().length;
+                APICards apiCards = returnedCards.get(0);
+                cardsQty = apiCards.getCards().length;
 
                 for (int i = 0; i < cardsQty; i++) {
-                    for (int y = 0; y < apiCard.getCards()[i].getForeignNames().length; y++) {
-                        if (apiCard.getCards()[i].getForeignNames()[y].getLanguage().equalsIgnoreCase("Portuguese (Brazil)")) {
-                            jsonCardsList.add(apiCard.getCards()[i].getForeignNames()[y].getName());
+                    for (int y = 0; y < apiCards.getCards()[i].getForeignNames().length; y++) {
+                        if (apiCards.getCards()[i].getForeignNames()[y].getLanguage().equalsIgnoreCase("Portuguese (Brazil)")) {
+                            jsonCardsList.add(apiCards.getCards()[i].getForeignNames()[y].getName());
                         }
                     }
                 }
@@ -329,7 +328,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(Call<APICard> call, Throwable t) {
+            public void onFailure(Call<APICards> call, Throwable t) {
                 if (call.isCanceled()) {
                     Log.e("apiSearchByName","request cancelled");
                 } else {
@@ -383,15 +382,11 @@ public class MainActivity extends AppCompatActivity {
      * Restores the data found on Google Drive
      */
     private void restoreBackup() {
-        DatabaseHelper       dbHelper  = new DatabaseHelper(this);
-        ArrayList<HaveCard> haveCards = dbHelper.getAllHaveCards();
-        ArrayList<WantCard> wantCards = dbHelper.getAllWantCards();
+        DatabaseHelper  dbHelper  = new DatabaseHelper(this);
+        ArrayList<Card> haveCards = dbHelper.getAllHaveCards();
+        ArrayList<Card> wantCards = dbHelper.getAllWantCards();
 
         if (haveCards.size() == 0 && wantCards.size() == 0) {
-//            progressDialog = new ProgressDialog(this, R.style.customProgressDialog);
-//            progressDialog.setMessage(this.getString(R.string.restoring_backup));
-//            progressDialog.show();
-
             requestSignIn();
             startActivityForResult(client.getSignInIntent(), REQUEST_CODE_DOWNLOAD_BACKUP);
         }

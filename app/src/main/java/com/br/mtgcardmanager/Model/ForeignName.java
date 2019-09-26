@@ -3,7 +3,7 @@ package com.br.mtgcardmanager.Model;
 public class ForeignName {
     private String name;
     private String language;
-    private int multiverseid;
+    private int    multiverseid;
 
 
     /**

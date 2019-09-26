@@ -5,7 +5,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
-import com.br.mtgcardmanager.Model.WantCard;
+import com.br.mtgcardmanager.Model.Card;
 
 import java.util.ArrayList;
 
@@ -21,14 +21,14 @@ import static com.br.mtgcardmanager.Helper.DatabaseHelper.TABLE_WANT;
 public class WantDAO {
     public long card_id;
 
-    public Long insertWantCard(SQLiteDatabase db, WantCard wantCard){
+    public Long insertWantCard(SQLiteDatabase db, Card card){
         ContentValues values = new ContentValues();
 
-        values.put(KEY_NAME_EN, wantCard.getName_en());
-        values.put(KEY_NAME_PT, wantCard.getName_pt());
-        values.put(KEY_ID_EDITION, wantCard.getId_edition());
-        values.put(KEY_QUANTITY, wantCard.getQuantity());
-        values.put(KEY_FOIL, wantCard.getFoil());
+        values.put(KEY_NAME_EN, card.getName_en());
+        values.put(KEY_NAME_PT, card.getName_pt());
+        values.put(KEY_ID_EDITION, card.getId_edition());
+        values.put(KEY_QUANTITY, card.getQuantity());
+        values.put(KEY_FOIL, card.getFoil());
 
         // insert row
         card_id = db.insert(TABLE_WANT, null, values);
@@ -36,10 +36,10 @@ public class WantDAO {
         return card_id;
     }
 
-    public ArrayList<WantCard> getAllWantCards(SQLiteDatabase db){
-        ArrayList<WantCard> cards       = new ArrayList<>();
-        String               selectQuery = "";
-        Cursor               cursor      = null;
+    public ArrayList<Card> getAllWantCards(SQLiteDatabase db){
+        ArrayList<Card> cards       = new ArrayList<>();
+        String          selectQuery = "";
+        Cursor          cursor      = null;
 
         Log.e(LOG, selectQuery);
         selectQuery = "SELECT * FROM " + TABLE_WANT + " ORDER BY " + KEY_NAME_PT;
@@ -48,7 +48,7 @@ public class WantDAO {
         // looping through all rows and adding to list
         if (cursor.moveToFirst()){
             do {
-                WantCard card = new WantCard();
+                Card card = new Card();
                 card.setId(cursor.getInt(cursor.getColumnIndex(KEY_ID)));
                 card.setName_en(cursor.getString(cursor.getColumnIndex(KEY_NAME_EN)));
                 card.setName_pt(cursor.getString(cursor.getColumnIndex(KEY_NAME_PT)));
@@ -56,7 +56,6 @@ public class WantDAO {
                 card.setQuantity(cursor.getInt(cursor.getColumnIndex(KEY_QUANTITY)));
                 card.setFoil(cursor.getString(cursor.getColumnIndex(KEY_FOIL)));
 
-                // adding to have cards list
                 cards.add(card);
             } while (cursor.moveToNext());
         }
@@ -70,7 +69,7 @@ public class WantDAO {
     }
 
 
-    public WantCard checkIfWantCardExists(SQLiteDatabase db, String name_en, int id_edition, String foil){
+    public Card checkIfWantCardExists(SQLiteDatabase db, String name_en, int id_edition, String foil){
         String selectQuery = "SELECT *" +
                 " FROM " + TABLE_WANT +
                 " WHERE " + KEY_NAME_EN + " = '" + name_en + "'" +
@@ -84,7 +83,7 @@ public class WantDAO {
             cursor.moveToFirst();
         }
 
-        WantCard existingCard = new WantCard();
+        Card existingCard = new Card();
 
         if (cursor.getCount() > 0) {
             existingCard.setId(cursor.getInt(cursor.getColumnIndex(KEY_ID)));

@@ -10,7 +10,7 @@ import android.widget.TextView;
 import com.br.mtgcardmanager.Helper.DatabaseHelper;
 import com.br.mtgcardmanager.Helper.UtilsHelper;
 import com.br.mtgcardmanager.LongClickListener;
-import com.br.mtgcardmanager.Model.HaveCard;
+import com.br.mtgcardmanager.Model.Card;
 import com.br.mtgcardmanager.R;
 
 /**
@@ -70,7 +70,7 @@ public class HaveViewHolder extends RecyclerView.ViewHolder implements View.OnLo
         String      name;
         int         quantity;
         int         id_edition;
-        HaveCard    existingCard;
+        Card        existingCard;
 
         edition_name = mCardEdition.getText().toString();
         name         = mCardName.getText().toString();

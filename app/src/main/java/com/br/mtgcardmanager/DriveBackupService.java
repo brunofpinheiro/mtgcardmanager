@@ -9,8 +9,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.br.mtgcardmanager.Helper.DatabaseHelper;
-import com.br.mtgcardmanager.Model.HaveCard;
-import com.br.mtgcardmanager.Model.WantCard;
+import com.br.mtgcardmanager.Model.Card;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
@@ -230,9 +229,9 @@ public class DriveBackupService {
                     gson    = new Gson();
 
                     if (driveFiles.getFiles().get(i).getName().contains("mtgcardmanager_want")) {
-                        WantCard[] wantCards = gson.fromJson(content, WantCard[].class);
-                        for (WantCard card : wantCards) {
-                            WantCard wantCard = new WantCard();
+                        Card[] wantCards = gson.fromJson(content, Card[].class);
+                        for (Card card : wantCards) {
+                            Card wantCard = new Card();
 
                             wantCard.setId(card.getId());
                             wantCard.setFoil(card.getFoil());
@@ -244,9 +243,9 @@ public class DriveBackupService {
                             db_helper.insertWantCard(wantCard);
                         }
                     } else {
-                        HaveCard[] haveCards = gson.fromJson(content, HaveCard[].class);
-                        for (HaveCard card : haveCards) {
-                            HaveCard haveCard = new HaveCard();
+                        Card[] haveCards = gson.fromJson(content, Card[].class);
+                        for (Card card : haveCards) {
+                            Card haveCard = new Card();
 
                             haveCard.setId(card.getId());
                             haveCard.setFoil(card.getFoil());

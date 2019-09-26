@@ -6,25 +6,23 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.br.mtgcardmanager.Model.Card;
 import com.br.mtgcardmanager.View.FragmentWant;
 import com.br.mtgcardmanager.Helper.DatabaseHelper;
 import com.br.mtgcardmanager.LongClickListener;
-import com.br.mtgcardmanager.Model.WantCard;
 import com.br.mtgcardmanager.R;
 import com.br.mtgcardmanager.View.WantViewHolder;
 
 import java.util.ArrayList;
 
-/**
- * Created by Bruno on 21/07/2016.
- */
-public class WantAdapter extends RecyclerView.Adapter<WantViewHolder> {
-    private Context              context;
-    private ArrayList<WantCard> want_cards;
 
-    public WantAdapter(Context context, ArrayList<WantCard> want_cards){
-        this.context    = context;
-        this.want_cards = want_cards;
+public class WantAdapter extends RecyclerView.Adapter<WantViewHolder> {
+    private Context         context;
+    private ArrayList<Card> wantCards;
+
+    public WantAdapter(Context context, ArrayList<Card> wantCards){
+        this.context   = context;
+        this.wantCards = wantCards;
     }
 
     //Create new views (invoked by the layout manager)
@@ -39,7 +37,7 @@ public class WantAdapter extends RecyclerView.Adapter<WantViewHolder> {
     @Override
     public void onBindViewHolder (final WantViewHolder viewHolder, int position) {
         DatabaseHelper  dbHelper = new DatabaseHelper(context);
-        final WantCard card = want_cards.get(position);
+        final Card card = wantCards.get(position);
 
         if (card.getName_en().isEmpty()) {
             viewHolder.mCardName.setText(card.getName_pt());
@@ -63,6 +61,6 @@ public class WantAdapter extends RecyclerView.Adapter<WantViewHolder> {
 
     @Override
     public int getItemCount(){
-        return want_cards.size();
+        return wantCards.size();
     }
 }

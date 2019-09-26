@@ -1,16 +1,11 @@
 package com.br.mtgcardmanager.DAO;
 
 import android.content.ContentValues;
-import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
-import com.br.mtgcardmanager.Helper.DatabaseHelper;
-import com.br.mtgcardmanager.Model.HaveCard;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
+import com.br.mtgcardmanager.Model.Card;
 
 import java.util.ArrayList;
 
@@ -26,13 +21,13 @@ import static com.br.mtgcardmanager.Helper.DatabaseHelper.TABLE_HAVE;
 public class HaveDAO {
     public long card_id;
 
-    public Long insertHaveCard(SQLiteDatabase db, HaveCard haveCard){
+    public Long insertHaveCard(SQLiteDatabase db, Card card){
         ContentValues values = new ContentValues();
-        values.put(KEY_NAME_EN, haveCard.getName_en());
-        values.put(KEY_NAME_PT, haveCard.getName_pt());
-        values.put(KEY_ID_EDITION, haveCard.getId_edition());
-        values.put(KEY_QUANTITY, haveCard.getQuantity());
-        values.put(KEY_FOIL, haveCard.getFoil());
+        values.put(KEY_NAME_EN, card.getName_en());
+        values.put(KEY_NAME_PT, card.getName_pt());
+        values.put(KEY_ID_EDITION, card.getId_edition());
+        values.put(KEY_QUANTITY, card.getQuantity());
+        values.put(KEY_FOIL, card.getFoil());
 
         // insert row
         card_id = db.insert(TABLE_HAVE, null, values);
@@ -40,10 +35,10 @@ public class HaveDAO {
         return card_id;
     }
 
-    public ArrayList<HaveCard> getAllHaveCards(SQLiteDatabase db){
-        ArrayList<HaveCard> cards       = new ArrayList<>();
-        String              selectQuery = "";
-        Cursor              cursor      = null;
+    public ArrayList<Card> getAllHaveCards(SQLiteDatabase db){
+        ArrayList<Card> cards       = new ArrayList<>();
+        String          selectQuery = "";
+        Cursor          cursor      = null;
 
         Log.e(LOG, selectQuery);
         selectQuery = "SELECT * FROM " + TABLE_HAVE + " ORDER BY " + KEY_NAME_PT;
@@ -52,7 +47,7 @@ public class HaveDAO {
         // looping through all rows and adding to list
         if (cursor.moveToFirst()){
             do {
-                HaveCard card = new HaveCard();
+                Card card = new Card();
                 card.setId(cursor.getInt(cursor.getColumnIndex(KEY_ID)));
                 card.setName_en(cursor.getString(cursor.getColumnIndex(KEY_NAME_EN)));
                 card.setName_pt(cursor.getString(cursor.getColumnIndex(KEY_NAME_PT)));
@@ -60,7 +55,6 @@ public class HaveDAO {
                 card.setQuantity(cursor.getInt(cursor.getColumnIndex(KEY_QUANTITY)));
                 card.setFoil(cursor.getString(cursor.getColumnIndex(KEY_FOIL)));
 
-                // adding to have cards list
                 cards.add(card);
             } while (cursor.moveToNext());
         }
@@ -73,7 +67,7 @@ public class HaveDAO {
         db.close();
     }
 
-    public HaveCard checkIfHaveCardExists(SQLiteDatabase db, String name_en, int id_edition, String foil){
+    public Card checkIfHaveCardExists(SQLiteDatabase db, String name_en, int id_edition, String foil){
         String selectQuery = "SELECT *" +
                 " FROM " + TABLE_HAVE +
                 " WHERE " + KEY_NAME_EN + " = '" + name_en + "'" +
@@ -87,7 +81,7 @@ public class HaveDAO {
             cursor.moveToFirst();
         }
 
-        HaveCard existingCard = new HaveCard();
+        Card existingCard = new Card();
 
         if (cursor.getCount() > 0) {
             existingCard.setId(cursor.getInt(cursor.getColumnIndex(KEY_ID)));

@@ -4,8 +4,8 @@ package com.br.mtgcardmanager.Helper;
  * Created by Bruno on 20/08/2016.
  */
 public class UtilsHelper {
-    String padronized_name;
-    String padronized_edition;
+    private String padronized_name;
+    private String padronized_edition;
 
     public String padronizeForSQL(String card_name){
         padronized_name = card_name;

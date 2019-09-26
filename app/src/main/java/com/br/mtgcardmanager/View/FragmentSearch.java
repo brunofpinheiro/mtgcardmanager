@@ -27,9 +27,8 @@ import com.android.volley.toolbox.Volley;
 import com.br.mtgcardmanager.Adapter.EditionsDialogAdapter;
 import com.br.mtgcardmanager.Helper.DatabaseHelper;
 import com.br.mtgcardmanager.Helper.UtilsHelper;
+import com.br.mtgcardmanager.Model.Card;
 import com.br.mtgcardmanager.Model.Edition;
-import com.br.mtgcardmanager.Model.HaveCard;
-import com.br.mtgcardmanager.Model.WantCard;
 import com.br.mtgcardmanager.R;
 import com.squareup.picasso.Picasso;
 
@@ -49,8 +48,6 @@ public class FragmentSearch extends Fragment implements View.OnClickListener, Ad
     private static Elements           cardNamePT;
     private static Elements           cardNameEN;
     private Edition                   edition;
-    private HaveCard                  haveCard = new HaveCard();
-    private WantCard                  wantCard = new WantCard();
     private String                    foil;
     public  Boolean                   secondRequest;
     public  Boolean                   longPress;
@@ -100,7 +97,7 @@ public class FragmentSearch extends Fragment implements View.OnClickListener, Ad
                     createEditionsDialog();
                 } else {
                     selectedEdition = cardEditions.get(0).getEdition();
-                    insertHave();
+                    insertCard("have");
                 }
                 return true;
             }
@@ -116,7 +113,7 @@ public class FragmentSearch extends Fragment implements View.OnClickListener, Ad
                     createEditionsDialog();
                 } else {
                     selectedEdition = cardEditions.get(0).getEdition();
-                    insertWant();
+                    insertCard("want");
                 }
                 return true;
             }
@@ -296,7 +293,7 @@ public class FragmentSearch extends Fragment implements View.OnClickListener, Ad
                     createEditionsDialog();
                 } else {
                     selectedEdition = cardEditions.get(0).getEdition();
-                    insertHave();
+                    insertCard("have");
                 }
                 break;
             } // end case
@@ -306,7 +303,7 @@ public class FragmentSearch extends Fragment implements View.OnClickListener, Ad
                     createEditionsDialog();
                 } else {
                     selectedEdition = cardEditions.get(0).getEdition();
-                    insertWant();
+                    insertCard("want");
                 }
                 break;
             }
@@ -349,20 +346,19 @@ public class FragmentSearch extends Fragment implements View.OnClickListener, Ad
 
         dialog.cancel();
         if (btn_have_pressed) {
-            insertHave();
+            insertCard("have");
         } else if (btn_want_pressed) {
-            insertWant();
+            insertCard("want");
         }
 
-    }// end onItemClick
+    }
 
-
-    public void insertHave() {
+    public void insertCard(String tableName) {
         utils     = new UtilsHelper();
         dbHelper  = DatabaseHelper.getInstance(this.getContext());
         int       id_edition;
         int       quantity;
-        HaveCard existingCard;
+        Card      existingCard = new Card();
 
         // Get edition info
         selectedEdition = utils.padronizeEdition(selectedEdition);
@@ -371,28 +367,47 @@ public class FragmentSearch extends Fragment implements View.OnClickListener, Ad
 
         if (id_edition > 0) {
             // If the card already exists update its quantity, else insert a new record
-            existingCard = dbHelper.checkIfHaveCardExists(utils.padronizeForSQL(cardNameEN.text()), id_edition, foil);
+            if (tableName.equalsIgnoreCase("have")) {
+                existingCard = dbHelper.checkIfHaveCardExists(utils.padronizeForSQL(cardNameEN.text()), id_edition, foil);
+            } else if (tableName.equalsIgnoreCase("want")){
+                existingCard = dbHelper.checkIfWantCardExists(utils.padronizeForSQL(cardNameEN.text()), id_edition, foil);
+            }
+
             if (existingCard.getQuantity() > 0) {
                 if (longPress) {
                     quantity = existingCard.getQuantity() + 4;
                 } else {
                     quantity = existingCard.getQuantity() + 1;
                 }
-                dbHelper.updateCardQuantity("have", existingCard.getId(), quantity);
+
+                if (tableName.equalsIgnoreCase("have")) {
+                    dbHelper.updateCardQuantity("have", existingCard.getId(), quantity);
+                } else if (tableName.equalsIgnoreCase("want")) {
+                    dbHelper.updateCardQuantity("want", existingCard.getId(), quantity);
+                }
+
             } else {
-                haveCard.setName_pt(cardNamePT.text());
-                haveCard.setName_en(cardNameEN.text());
-                haveCard.setId_edition(edition.getId());
-                haveCard.setFoil(foil);
+                Card newCard = new Card();
+                newCard.setName_pt(cardNamePT.text());
+                newCard.setName_en(cardNameEN.text());
+                newCard.setId_edition(edition.getId());
+                newCard.setFoil(foil);
+
                 if (longPress) {
                     quantity = 4;
-                    haveCard.setQuantity(quantity);
+                    newCard.setQuantity(quantity);
                 } else {
                     quantity = 1;
-                    haveCard.setQuantity(quantity);
+                    newCard.setQuantity(quantity);
                 }
-                dbHelper.insertHaveCard(haveCard);
+
+                if (tableName.equalsIgnoreCase("have")) {
+                    dbHelper.insertHaveCard(newCard);
+                } else if (tableName.equalsIgnoreCase("want")) {
+                    dbHelper.insertWantCard(newCard);
+                }
             }
+
             if (dbHelper.card_id != 0) {
                 if (longPress) {
                     Toast.makeText(getActivity().getApplicationContext(), R.string.four_cards_inserted, Toast.LENGTH_SHORT).show();
@@ -401,74 +416,22 @@ public class FragmentSearch extends Fragment implements View.OnClickListener, Ad
                 }
 
                 // Refresh the contents of FragmentHave
-                FragmentHave fragmentHave = new FragmentHave();
-                fragmentHave.refreshRecyclerView(true);
+                if (tableName.equalsIgnoreCase("have")) {
+                    FragmentHave fragmentHave = new FragmentHave();
+                    fragmentHave.refreshRecyclerView(true);
+                } else if (tableName.equalsIgnoreCase("want")) {
+                    FragmentWant fragmentWant = new FragmentWant();
+                    fragmentWant.refreshRecyclerView(true);
+                }
+
             } else {
                 Toast.makeText(getActivity().getApplicationContext(), R.string.insert_failed, Toast.LENGTH_LONG).show();
             }
 
             longPress        = false;
             btn_have_pressed = false;
-            foil             = "N";
-        }// end if
-    }// end insertHave
-
-
-    public void insertWant() {
-        utils     = new UtilsHelper();
-        dbHelper  = DatabaseHelper.getInstance(this.getContext());
-
-        int       id_edition;
-        int       quantity;
-        WantCard existingCard;
-
-        // Get edition info
-        selectedEdition = utils.padronizeEdition(selectedEdition);
-        edition         = dbHelper.getSingleEdition(this.getContext(), selectedEdition);
-        id_edition      = edition.getId();
-
-        if (id_edition > 0) {
-            // If the card already exists update its quantity, else insert a new record
-            existingCard = dbHelper.checkIfWantCardExists(utils.padronizeForSQL(cardNameEN.text()), id_edition, foil);
-            if (existingCard.getQuantity() > 0) {
-                if (longPress) {
-                    quantity = existingCard.getQuantity() + 4;
-                } else {
-                    quantity = existingCard.getQuantity() + 1;
-                }
-                dbHelper.updateCardQuantity("want", existingCard.getId(), quantity);
-            } else {
-                wantCard.setName_pt(cardNamePT.text());
-                wantCard.setName_en(cardNameEN.text());
-                wantCard.setId_edition(edition.getId());
-                wantCard.setFoil(foil);
-                if (longPress) {
-                    quantity = 4;
-                    wantCard.setQuantity(quantity);
-                } else {
-                    quantity = 1;
-                    wantCard.setQuantity(quantity);
-                }
-                dbHelper.insertWantCard(wantCard);
-            }
-            if (dbHelper.card_id != 0) {
-                if (longPress) {
-                    Toast.makeText(getActivity().getApplicationContext(), R.string.four_cards_inserted, Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(getActivity().getApplicationContext(), R.string.one_card_inserted, Toast.LENGTH_SHORT).show();
-                }
-
-                // Refresh the contents of FragmentHave
-                FragmentWant fragmentWant = new FragmentWant();
-                fragmentWant.refreshRecyclerView(true);
-
-            } else {
-                Toast.makeText(getActivity().getApplicationContext(), R.string.insert_failed, Toast.LENGTH_SHORT).show();
-            }
-
-            longPress        = false;
             btn_want_pressed = false;
             foil             = "N";
-        }// end if
-    }// end insertHave
-}// end fragment
+        }
+    }
+}
