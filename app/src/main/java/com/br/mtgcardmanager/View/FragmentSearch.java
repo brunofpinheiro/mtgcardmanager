@@ -50,11 +50,14 @@ public class FragmentSearch extends Fragment implements View.OnClickListener, Ad
     private Edition                   edition;
     private String                    foil;
     public  Boolean                   secondRequest;
-    public  Boolean                   longPress;
     public  Boolean                   btn_have_pressed;
+    public  Boolean                   btn_have_4_pressed;
     public  Boolean                   btn_want_pressed;
-    public  Button                    buttonHave;
-    public  Button                    buttonWant;
+    public  Boolean                   btn_want_4_pressed;
+    public  Button                    mButtonHave;
+    public  Button                    mButtonHave4;
+    public  Button                    mButtonWant;
+    public  Button                    mButtonWant4;
     public  DatabaseHelper            dbHelper;
     public  Dialog                    dialog;
     public  Document                  doc;
@@ -79,45 +82,24 @@ public class FragmentSearch extends Fragment implements View.OnClickListener, Ad
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        fragSearchView   = inflater.inflate(R.layout.fragment_search, container, false);
-        longPress        = false;
-        btn_have_pressed = false;
-        btn_want_pressed = false;
-        foil             = "N";
+        fragSearchView = inflater.inflate(R.layout.fragment_search, container, false);
+        mButtonHave    = fragSearchView.findViewById(R.id.btn_tenho);
+        mButtonHave4   = fragSearchView.findViewById(R.id.btn_tenho_4);
+        mButtonWant    = fragSearchView.findViewById(R.id.btn_quero);
+        mButtonWant4   = fragSearchView.findViewById(R.id.btn_quero_4);
+
+        btn_have_pressed   = false;
+        btn_have_4_pressed = false;
+        btn_want_pressed   = false;
+        btn_want_4_pressed = false;
+        foil               = "N";
 
         // set listeners for the buttons
-        buttonHave = fragSearchView.findViewById(R.id.btn_tenho);
-        buttonHave.setOnClickListener(this);
-        buttonHave.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View view) {
-                longPress = true;
-                btn_have_pressed = true;
-                if (cardEditions.size() > 1) {
-                    createEditionsDialog();
-                } else {
-                    selectedEdition = cardEditions.get(0).getEdition();
-                    insertCard("have");
-                }
-                return true;
-            }
-        });
-        buttonWant = fragSearchView.findViewById(R.id.btn_quero);
-        buttonWant.setOnClickListener(this);
-        buttonWant.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View view) {
-                longPress = true;
-                btn_want_pressed = true;
-                if (cardEditions.size() > 1) {
-                    createEditionsDialog();
-                } else {
-                    selectedEdition = cardEditions.get(0).getEdition();
-                    insertCard("want");
-                }
-                return true;
-            }
-        });
+        mButtonHave.setOnClickListener(this);
+        mButtonHave4.setOnClickListener(this);
+        mButtonWant.setOnClickListener(this);
+        mButtonWant4.setOnClickListener(this);
+
         return fragSearchView;
     }
 
@@ -210,7 +192,9 @@ public class FragmentSearch extends Fragment implements View.OnClickListener, Ad
      */
     public void montarLayout(Activity activity, ImageView mCardImage, TextView mCardNamePT, TextView mCardNameEN){
         Button   mBtnHaveAdd;
+        Button   mBtnHaveAdd4;
         Button   mBtnWantAdd;
+        Button   mBtnWantAdd4;
         TextView mTvPrices;
         TextView mTvMinPrice;
         TextView mTvMaxPrice;
@@ -221,14 +205,18 @@ public class FragmentSearch extends Fragment implements View.OnClickListener, Ad
         String   menorPreco;
         String   maiorPreco;
 
-        mBtnHaveAdd = activity.findViewById(R.id.btn_tenho);
-        mBtnWantAdd = activity.findViewById(R.id.btn_quero);
-        mTvPrices   = activity.findViewById(R.id.tvPrices);
-        mTvMinPrice = activity.findViewById(R.id.tvMinPrice);
-        mTvMaxPrice = activity.findViewById(R.id.tvMaxPrice);
+        mBtnHaveAdd  = activity.findViewById(R.id.btn_tenho);
+        mBtnHaveAdd4 = activity.findViewById(R.id.btn_tenho_4);
+        mBtnWantAdd  = activity.findViewById(R.id.btn_quero);
+        mBtnWantAdd4 = activity.findViewById(R.id.btn_quero_4);
+        mTvPrices    = activity.findViewById(R.id.tvPrices);
+        mTvMinPrice  = activity.findViewById(R.id.tvMinPrice);
+        mTvMaxPrice  = activity.findViewById(R.id.tvMaxPrice);
 
         mBtnHaveAdd.setVisibility(View.VISIBLE);
+        mBtnHaveAdd4.setVisibility(View.VISIBLE);
         mBtnWantAdd.setVisibility(View.VISIBLE);
+        mBtnWantAdd4.setVisibility(View.VISIBLE);
         mTvPrices.setVisibility(View.VISIBLE);
         mTvMinPrice.setVisibility(View.VISIBLE);
         mTvMaxPrice.setVisibility(View.VISIBLE);
@@ -296,7 +284,17 @@ public class FragmentSearch extends Fragment implements View.OnClickListener, Ad
                     insertCard("have");
                 }
                 break;
-            } // end case
+            }
+            case R.id.btn_tenho_4: {
+                btn_have_4_pressed = true;
+                if (cardEditions.size() > 1) {
+                    createEditionsDialog();
+                } else {
+                    selectedEdition = cardEditions.get(0).getEdition();
+                    insertCard("have");
+                }
+                break;
+            }
             case R.id.btn_quero: {
                 btn_want_pressed = true;
                 if (cardEditions.size() > 1) {
@@ -307,8 +305,18 @@ public class FragmentSearch extends Fragment implements View.OnClickListener, Ad
                 }
                 break;
             }
-        }// end switch
-    }// end onClick
+            case R.id.btn_quero_4: {
+                btn_want_4_pressed = true;
+                if (cardEditions.size() > 1) {
+                    createEditionsDialog();
+                } else {
+                    selectedEdition = cardEditions.get(0).getEdition();
+                    insertCard("want");
+                }
+                break;
+            }
+        }
+    }
 
     public void createEditionsDialog() {
         dialog = new Dialog(this.getContext(), R.style.customDialogTheme);
@@ -345,9 +353,9 @@ public class FragmentSearch extends Fragment implements View.OnClickListener, Ad
         selectedEdition = edition.getEdition();
 
         dialog.cancel();
-        if (btn_have_pressed) {
+        if (btn_have_pressed || btn_have_4_pressed) {
             insertCard("have");
-        } else if (btn_want_pressed) {
+        } else if (btn_want_pressed || btn_want_4_pressed) {
             insertCard("want");
         }
 
@@ -374,7 +382,7 @@ public class FragmentSearch extends Fragment implements View.OnClickListener, Ad
             }
 
             if (existingCard.getQuantity() > 0) {
-                if (longPress) {
+                if (btn_have_4_pressed || btn_want_4_pressed) {
                     quantity = existingCard.getQuantity() + 4;
                 } else {
                     quantity = existingCard.getQuantity() + 1;
@@ -393,7 +401,7 @@ public class FragmentSearch extends Fragment implements View.OnClickListener, Ad
                 newCard.setId_edition(edition.getId());
                 newCard.setFoil(foil);
 
-                if (longPress) {
+                if (btn_have_4_pressed || btn_want_4_pressed) {
                     quantity = 4;
                     newCard.setQuantity(quantity);
                 } else {
@@ -409,7 +417,7 @@ public class FragmentSearch extends Fragment implements View.OnClickListener, Ad
             }
 
             if (dbHelper.card_id != 0) {
-                if (longPress) {
+                if (btn_have_4_pressed || btn_want_4_pressed) {
                     Toast.makeText(getActivity().getApplicationContext(), R.string.four_cards_inserted, Toast.LENGTH_SHORT).show();
                 } else {
                     Toast.makeText(getActivity().getApplicationContext(), R.string.one_card_inserted, Toast.LENGTH_SHORT).show();
@@ -428,10 +436,11 @@ public class FragmentSearch extends Fragment implements View.OnClickListener, Ad
                 Toast.makeText(getActivity().getApplicationContext(), R.string.insert_failed, Toast.LENGTH_LONG).show();
             }
 
-            longPress        = false;
-            btn_have_pressed = false;
-            btn_want_pressed = false;
-            foil             = "N";
+            btn_have_pressed   = false;
+            btn_have_4_pressed = false;
+            btn_want_pressed   = false;
+            btn_want_4_pressed = false;
+            foil               = "N";
         }
     }
 }

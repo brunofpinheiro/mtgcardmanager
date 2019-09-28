@@ -46,8 +46,10 @@
     <string name="restoring_backup">Restaurando o backup…</string>
 
     <!--BUTTONS-->
-    <string name="btn_have_add">TENHO</string>
-    <string name="btn_want_add">QUERO</string>
+    <string name="btn_have_add">TENHO +1</string>
+    <string name="btn_want_add">QUERO +1</string>
+    <string name="btn_have_add_4">TENHO +4</string>
+    <string name="btn_want_add_4">QUERO +4</string>
     
     <!--TABLE HEADERS-->
     <string name="header_name">Nome</string>

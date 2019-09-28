@@ -42,7 +42,6 @@
             android:id="@+id/ivCardImageID"
             android:layout_width="220dp"
             android:layout_height="275dp"
-            android:layout_alignLeft="@id/btn_tenho"
             android:layout_below="@id/cardNameEN"
             android:layout_marginTop="25dp"
             android:contentDescription="@string/imageViewContentDescription"
@@ -83,14 +82,22 @@
             android:textSize="18sp"
             android:visibility="invisible" />
 
+        <View android:id="@+id/strut"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="25dp"
+            android:layout_below="@id/ivCardImageID"
+            android:layout_centerHorizontal="true"/>
+
         <Button
             android:id="@+id/btn_tenho"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/ivCardImageID"
-            android:layout_marginTop="30dp"
-            android:minHeight="35dip"
+            android:layout_alignTop="@id/strut"
+            android:layout_alignEnd="@id/strut"
+            android:layout_marginEnd="5dp"
             android:background="@color/colorPrimary"
+            android:minHeight="35dip"
             android:text="@string/btn_have_add"
             android:textColor="@color/textPrimary"
             android:textSize="18sp"
@@ -100,14 +107,51 @@
             android:id="@+id/btn_quero"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/btn_tenho"
-            android:layout_marginTop="10dp"
-            android:minHeight="35dip"
+            android:layout_alignStart="@id/strut"
+            android:layout_alignTop="@id/strut"
+            android:layout_marginStart="5dp"
             android:background="@color/colorPrimary"
+            android:minHeight="35dip"
             android:text="@string/btn_want_add"
             android:textColor="@color/textPrimary"
             android:textSize="18sp"
             android:visibility="invisible" />
 
+        <View android:id="@+id/strut2"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="10dp"
+            android:layout_below="@id/btn_tenho"
+            android:layout_centerHorizontal="true"/>
+
+        <Button
+            android:id="@+id/btn_tenho_4"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignEnd="@id/strut2"
+            android:layout_alignTop="@id/strut2"
+            android:layout_marginEnd="5dp"
+            android:background="@color/colorPrimary"
+            android:minHeight="35dip"
+            android:text="@string/btn_have_add_4"
+            android:textColor="@color/textPrimary"
+            android:textSize="18sp"
+            android:visibility="invisible" />
+
+        <Button
+            android:id="@+id/btn_quero_4"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignStart="@id/strut2"
+            android:layout_alignTop="@id/strut2"
+            android:layout_marginStart="5dp"
+            android:background="@color/colorPrimary"
+            android:minHeight="35dip"
+            android:text="@string/btn_want_add_4"
+            android:textColor="@color/textPrimary"
+            android:textSize="18sp"
+            android:visibility="invisible" />
     </RelativeLayout>
+
+
 </ScrollView>
