@@ -1,8 +1,6 @@
 package com.br.mtgcardmanager.Helper;
 
-/**
- * Created by Bruno on 20/08/2016.
- */
+
 public class UtilsHelper {
     private String padronized_name;
     private String padronized_edition;
@@ -21,7 +19,7 @@ public class UtilsHelper {
         padronized_edition = edition;
 
         if (edition.contains("/")) {
-            int name_separator  = edition.lastIndexOf("/");
+            int name_separator = edition.lastIndexOf("/");
             padronized_edition = edition.substring(name_separator +1, edition.length()).trim();
         }
 
@@ -32,9 +30,9 @@ public class UtilsHelper {
         padronized_name = card_name;
 
         if (card_name.contains("(")) {
-            int first_separator = card_name.lastIndexOf("(") ;
+            int first_separator  = card_name.lastIndexOf("(") ;
             int second_separator = card_name.lastIndexOf(")") ;
-            padronized_name   = card_name.substring(first_separator + 1, second_separator).trim();
+            padronized_name      = card_name.substring(first_separator + 1, second_separator).trim();
         }
 
         return padronized_name;

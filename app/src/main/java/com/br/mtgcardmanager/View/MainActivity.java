@@ -243,6 +243,11 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * Filters the cards based on what the user typed
+     * @param fragmentName
+     * @param query
+     */
     private void filterCardList(String fragmentName, String query) {
         if (fragmentName.equalsIgnoreCase("have")) {
             FragmentHave fragmentHave = new FragmentHave();

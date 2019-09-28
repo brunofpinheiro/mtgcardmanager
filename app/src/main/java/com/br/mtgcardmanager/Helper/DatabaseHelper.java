@@ -138,11 +138,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return haveDAO.getAllHaveCards(db);
     }
 
-    public void deleteHaveCard(long id_have_card){
+    public int deleteHaveCard(long id_have_card){
         db              = this.getWritableDatabase();
         HaveDAO haveDAO = new HaveDAO();
 
-        haveDAO.deleteHaveCard(db, id_have_card);
+        return haveDAO.deleteHaveCard(db, id_have_card);
+    }
+
+    public void deleteAllHave() {
+        db              = this.getWritableDatabase();
+        HaveDAO haveDAO = new HaveDAO();
+
+        haveDAO.deleteAll(db);
     }
 
     public Card checkIfHaveCardExists(String name_en, int id_edition, String foil){
@@ -172,11 +179,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return wantDAO.getAllWantCards(db);
     }
 
-    public void deleteWantCard(long id_want_card){
+    public int deleteWantCard(long id_want_card){
         db              = this.getWritableDatabase();
         WantDAO wantDAO = new WantDAO();
 
-        wantDAO.deleteWantCard(db, id_want_card);
+        return wantDAO.deleteWantCard(db, id_want_card);
+    }
+
+    public void deleteAllWant() {
+        db              = this.getWritableDatabase();
+        WantDAO wantDAO = new WantDAO();
+
+        wantDAO.deleteAll(db);
     }
 
     public Card checkIfWantCardExists(String name_en, int id_edition, String foil){

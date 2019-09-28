@@ -62,8 +62,17 @@ public class HaveDAO {
         return cards;
     }
 
-    public void deleteHaveCard(SQLiteDatabase db, long id_have_card){
-        db.delete(TABLE_HAVE, KEY_ID + " = ?", new String[] { String.valueOf(id_have_card) });
+    public int deleteHaveCard(SQLiteDatabase db, long id_have_card){
+        int rowsAffected;
+
+        rowsAffected = db.delete(TABLE_HAVE, KEY_ID + " = ?", new String[]{String.valueOf(id_have_card)});
+        db.close();
+
+        return rowsAffected;
+    }
+
+    public void deleteAll(SQLiteDatabase db){
+        db.delete(TABLE_HAVE, null, null);
         db.close();
     }
 

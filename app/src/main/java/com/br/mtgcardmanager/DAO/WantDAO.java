@@ -63,8 +63,17 @@ public class WantDAO {
         return cards;
     }
 
-    public void deleteWantCard(SQLiteDatabase db, long id_want_card){
-        db.delete(TABLE_WANT, KEY_ID + " = ?", new String[] { String.valueOf(id_want_card) });
+    public int deleteWantCard(SQLiteDatabase db, long id_want_card){
+        int rowsAffected;
+
+        rowsAffected = db.delete(TABLE_WANT, KEY_ID + " = ?", new String[] { String.valueOf(id_want_card) });
+        db.close();
+
+        return rowsAffected;
+    }
+
+    public void deleteAll(SQLiteDatabase db){
+        db.delete(TABLE_WANT, null, null);
         db.close();
     }
 

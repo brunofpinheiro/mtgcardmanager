@@ -33,7 +33,7 @@ public class EditionDAO {
     }
 
     public Edition getSingleEdition(SQLiteDatabase db, Context context, String selectedEdition) {
-        Cursor   cursor  = null;
+        Cursor  cursor  = null;
         Edition edition = new Edition();
 
         try {
