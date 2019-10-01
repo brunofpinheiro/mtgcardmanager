@@ -15,9 +15,7 @@ import com.br.mtgcardmanager.R;
 
 import java.util.ArrayList;
 
-/**
- * Created by Bruno on 21/07/2016.
- */
+
 public class HaveAdapter extends RecyclerView.Adapter<HaveViewHolder> {
     private Context         context;
     private ArrayList<Card> haveCards;

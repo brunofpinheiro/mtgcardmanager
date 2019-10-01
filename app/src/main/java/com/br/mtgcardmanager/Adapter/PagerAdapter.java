@@ -8,9 +8,7 @@ import com.br.mtgcardmanager.View.FragmentHave;
 import com.br.mtgcardmanager.View.FragmentSearch;
 import com.br.mtgcardmanager.View.FragmentWant;
 
-/**
- * Created by BRUNO on 10/05/2016.
- */
+
 public class PagerAdapter extends FragmentStatePagerAdapter{
     int                   mNumOfTabs;
 

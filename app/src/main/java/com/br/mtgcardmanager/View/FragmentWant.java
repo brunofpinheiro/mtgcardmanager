@@ -9,6 +9,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v4.app.NotificationCompat;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -42,6 +43,7 @@ public class FragmentWant extends Fragment {
     public static  String           contextMenuNamePt;
     public static  String           contextMenuFoil;
     private        int              notificationNumber;
+    private SwipeRefreshLayout      swipeContainer;
 
 
     public FragmentWant() {
@@ -52,12 +54,22 @@ public class FragmentWant extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView      = inflater.inflate(R.layout.fragment_want, container, false);
         recyclerView       = rootView.findViewById(R.id.recycler_view_want);
+        swipeContainer     = rootView.findViewById(R.id.want_swipe_container);
         mNoCardsMessage    = rootView.findViewById(R.id.no_cards_message);
         fragmentActivity   = this.getActivity();
         notificationNumber = 0;
 
         registerForContextMenu(recyclerView);
         refreshRecyclerView(true);
+
+        swipeContainer.setOnRefreshListener(() -> {
+            refreshRecyclerView(false);
+            swipeContainer.setRefreshing(false);
+        });
+        swipeContainer.setColorSchemeResources(R.color.colorPrimary,
+                android.R.color.holo_green_light,
+                android.R.color.holo_orange_light,
+                android.R.color.holo_red_light);
 
         return rootView;
     }
