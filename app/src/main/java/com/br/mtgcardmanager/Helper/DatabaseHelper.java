@@ -22,30 +22,30 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public               ArrayList<Edition> currentEditions;
     public               long               editionsCount;
     public               long               card_id;
-    public static        SQLiteDatabase     db;
+    public  static       SQLiteDatabase     db;
     private static       DatabaseHelper     sInstance;
-    public static  final String             LOG = "DatabaseHelper";
+    public  static final String             LOG = "DatabaseHelper";
     private static final int                DATABASE_VERSION = 1;
-    public static  final String             DATABASE_NAME    = "mtgCardManager";
+    public  static final String             DATABASE_NAME    = "mtgCardManager";
 
     //Table names
-    public static  final String             TABLE_HAVE      = "have";
-    public static  final String             TABLE_WANT      = "want";
-    public static  final String             TABLE_EDITIONS  = "editions";
-    public static  final String             TABLE_ALL_CARDS = "all_cards";
+    public  static  final String             TABLE_HAVE      = "have";
+    public  static  final String             TABLE_WANT      = "want";
+    public  static  final String             TABLE_EDITIONS  = "editions";
+    public  static  final String             TABLE_ALL_CARDS = "all_cards";
 
     //Commom column names
-    public static  final String             KEY_ID            = "id";
-    public static  final String             KEY_NAME_EN       = "name_en";
-    public static  final String             KEY_NAME_PT       = "name_pt";
-    public static  final String             KEY_ID_EDITION    = "id_edition";
-    public static  final String             KEY_QUANTITY      = "quantity";
-    public static  final String             KEY_FOIL          = "foil";
+    public  static  final String             KEY_ID            = "id";
+    public  static  final String             KEY_NAME_EN       = "name_en";
+    public  static  final String             KEY_NAME_PT       = "name_pt";
+    public  static  final String             KEY_ID_EDITION    = "id_edition";
+    public  static  final String             KEY_QUANTITY      = "quantity";
+    public  static  final String             KEY_FOIL          = "foil";
 
     //EDITIONS Table - specific column names
-    public static  final String             KEY_EDITION_SHORT = "edition_short";
-    public static  final String             KEY_EDITION       = "edition";
-    public static  final String             KEY_EDITION_PT    = "edition_pt";
+    public  static  final String             KEY_EDITION_SHORT = "edition_short";
+    public  static  final String             KEY_EDITION       = "edition";
+    public  static  final String             KEY_EDITION_PT    = "edition_pt";
 
 
     public DatabaseHelper(Context context) {

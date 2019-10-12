@@ -10,6 +10,7 @@ import android.widget.Toast;
 
 import com.br.mtgcardmanager.Helper.DatabaseHelper;
 import com.br.mtgcardmanager.Model.Card;
+import com.br.mtgcardmanager.View.MainActivity;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
@@ -166,7 +167,7 @@ public class DriveBackupService {
                             progressDialog.setMessage(activity.getString(R.string.restoring_backup));
                             progressDialog.show();
 
-                            restoreExistingBackup()
+                            restoreExistingBackup(activity)
                                     .addOnCompleteListener(complete -> {
                                         if (progressDialog != null) {
                                             progressDialog.dismiss();
@@ -202,7 +203,7 @@ public class DriveBackupService {
      * each object into it's corresponding table.
      * @return
      */
-    private Task<Void> restoreExistingBackup() {
+    private Task<Void> restoreExistingBackup(Activity activity) {
         return Tasks.call(mExecutor, () -> {
             FileList       driveFiles;
             InputStream    is;
@@ -212,7 +213,7 @@ public class DriveBackupService {
             String         content;
             Gson           gson;
 
-            db_helper  = DatabaseHelper.getInstance(activity);
+            db_helper  = new DatabaseHelper(activity);
             driveFiles = mDriveService.files().list().execute();
 
             if (driveFiles.getFiles().size() > 0) {

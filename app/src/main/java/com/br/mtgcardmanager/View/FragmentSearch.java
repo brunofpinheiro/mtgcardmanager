@@ -125,7 +125,7 @@ public class FragmentSearch extends Fragment implements View.OnClickListener, Ad
         cardEditions = new ArrayList<>();
 
         if (dbHelper == null)
-            dbHelper  = DatabaseHelper.getInstance(this.getContext());
+            dbHelper  = new DatabaseHelper(activity.getApplicationContext());
 
         if (availableEditions == null || availableEditions.size() == 0)
             availableEditions = dbHelper.getAllEditions();

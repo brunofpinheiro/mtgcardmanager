@@ -23,7 +23,6 @@ import com.br.mtgcardmanager.Helper.DatabaseHelper;
 import com.br.mtgcardmanager.Model.APICards;
 import com.br.mtgcardmanager.Model.Card;
 import com.br.mtgcardmanager.Network.GetDataService;
-import com.br.mtgcardmanager.Network.RetrofitClientInstance;
 import com.br.mtgcardmanager.R;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
@@ -51,8 +50,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 
 
@@ -106,20 +103,14 @@ public class MainActivity extends AppCompatActivity {
 
         // Create or update EDITIONS table
         dbHelper = new DatabaseHelper(this);
-//        dbHelper.deleteAllCards();
-        getAllCardsFromAsset();
-
         dbHelper.populateEditionsList();
         dbHelper.getEditionsQty();
-
-//        dbHelper.deleteAllCards();
-//        getAllCardsFromAsset();
-//        getAllCardsFromAPI();
-
 
         if (dbHelper.editionsCount < dbHelper.currentEditions.size()) {
             dbHelper.insertAllEditions();
         }
+
+        getAllCardsFromAsset();
 
         TabLayout tabLayout = findViewById(R.id.tab_layout_id);
         tabLayout.addTab(tabLayout.newTab().setText(getString(R.string.fragment_have_name)));
