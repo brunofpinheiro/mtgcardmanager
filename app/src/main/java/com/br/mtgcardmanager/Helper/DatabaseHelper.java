@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.br.mtgcardmanager.DAO.AllCardsDAO;
 import com.br.mtgcardmanager.DAO.EditionDAO;
 import com.br.mtgcardmanager.DAO.HaveDAO;
 import com.br.mtgcardmanager.DAO.WantDAO;
@@ -12,6 +13,7 @@ import com.br.mtgcardmanager.Model.Card;
 import com.br.mtgcardmanager.Model.Edition;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Bruno on 23/07/2016.
@@ -24,12 +26,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static       DatabaseHelper     sInstance;
     public static  final String             LOG = "DatabaseHelper";
     private static final int                DATABASE_VERSION = 1;
-    public static  final String             DATABASE_NAME     = "mtgCardManager";
+    public static  final String             DATABASE_NAME    = "mtgCardManager";
 
     //Table names
-    public static  final String             TABLE_HAVE        = "have";
-    public static  final String             TABLE_WANT        = "want";
-    public static  final String             TABLE_EDITIONS    = "editions";
+    public static  final String             TABLE_HAVE      = "have";
+    public static  final String             TABLE_WANT      = "want";
+    public static  final String             TABLE_EDITIONS  = "editions";
+    public static  final String             TABLE_ALL_CARDS = "all_cards";
 
     //Commom column names
     public static  final String             KEY_ID            = "id";
@@ -84,8 +87,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String CREATE_TABLE_EDITIONS = "CREATE TABLE "
             + TABLE_EDITIONS + "(" + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
             + KEY_EDITION_SHORT + " TEXT, "
-            + KEY_EDITION + " TEXT, "
-            + KEY_EDITION_PT + " TEXT)";
+            + KEY_EDITION +       " TEXT, "
+            + KEY_EDITION_PT +    " TEXT)";
+
+    // WANT Table Create Statement
+    private final String CREATE_TABLE_ALL_CARDS = "CREATE TABLE "
+            + TABLE_ALL_CARDS + "(" + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+            + KEY_NAME_EN +    " TEXT, "
+            + KEY_NAME_PT +    " TEXT)";
 
     @Override
     public void onCreate(SQLiteDatabase db) {
@@ -93,6 +102,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_TABLE_HAVE);
         db.execSQL(CREATE_TABLE_WANT);
         db.execSQL(CREATE_TABLE_EDITIONS);
+        db.execSQL(CREATE_TABLE_ALL_CARDS);
         insertAllEditions();
     }
 
@@ -102,6 +112,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_HAVE);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_WANT);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_EDITIONS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_ALL_CARDS);
 
         // create new tables
         onCreate(db);
@@ -263,5 +274,43 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         currentEditions = editionDAO.populateEditionsList();
 
         return currentEditions;
+    }
+
+    //*************************************
+    //***** ALL CARDS Table functions *****
+    //*************************************
+    public ArrayList<Card> getAllCards(){
+        db                      = this.getReadableDatabase();
+        AllCardsDAO allCardsDAO = new AllCardsDAO();
+
+        return allCardsDAO.getAll(db);
+    }
+
+    public int getAllCardsCount(){
+        db                      = this.getReadableDatabase();
+        AllCardsDAO allCardsDAO = new AllCardsDAO();
+
+        return allCardsDAO.getAllCardsCount(db);
+    }
+
+    public Long insertAllCards(List<Card> allCards){
+        db                      = this.getReadableDatabase();
+        AllCardsDAO allCardsDAO = new AllCardsDAO();
+
+        return allCardsDAO.insertAll(db, allCards);
+    }
+
+    public void deleteAllCards() {
+        db                      = this.getWritableDatabase();
+        AllCardsDAO allCardsDAO = new AllCardsDAO();
+
+        allCardsDAO.deleteAll(db);
+    }
+
+    public List<Card> getSuggestionByName(String name) {
+        db                      = this.getWritableDatabase();
+        AllCardsDAO allCardsDAO = new AllCardsDAO();
+
+        return allCardsDAO.getByName(db, name);
     }
 }

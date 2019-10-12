@@ -8,7 +8,7 @@ import retrofit2.http.Query;
 
 public interface GetDataService {
     @GET("/v1/cards")
-    Call<APICards> getAllCards();
+    Call<APICards> getAllCards(@Query("page") int page);
 
     @GET("/v1/cards")
     Call<APICards> getCardsByName(@Query("name") String name, @Query("language") String language, @Query("pageSize") int pageSize);

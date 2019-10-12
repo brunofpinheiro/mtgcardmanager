@@ -39,6 +39,12 @@ import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -60,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
     private              AdView                        mAdView;
     public static        boolean                       running = false;
     private              SearchView.SearchAutoComplete searchAutoComplete;
-    private              Call<APICards>                 call = null;
+    private              Call<APICards>                call = null;
     private              ArrayAdapter<String>          adapter = null;
     private              SearchView                    searchView = null;
     private              DriveBackupService            driveBackupService;
@@ -71,15 +77,15 @@ public class MainActivity extends AppCompatActivity {
     private static final int                           REQUEST_CODE_UPLOAD_BACKUP = 2;
     private static final int                           REQUEST_CODE_DOWNLOAD_BACKUP = 3;
     private              ProgressDialog                progressDialog;
+    private              int                           pageCount = 1;
+    private              GetDataService                service;
+    private              List<Card>                    allCardsList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         running = true;
-
-//        scheduleAlarm();
-
         mAdView = findViewById(R.id.ad_view);
 
         // Initialize the Mobile Ads SDK.
@@ -99,9 +105,17 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         // Create or update EDITIONS table
-        dbHelper = DatabaseHelper.getInstance(this);
+        dbHelper = new DatabaseHelper(this);
+//        dbHelper.deleteAllCards();
+        getAllCardsFromAsset();
+
         dbHelper.populateEditionsList();
         dbHelper.getEditionsQty();
+
+//        dbHelper.deleteAllCards();
+//        getAllCardsFromAsset();
+//        getAllCardsFromAPI();
+
 
         if (dbHelper.editionsCount < dbHelper.currentEditions.size()) {
             dbHelper.insertAllEditions();
@@ -211,11 +225,25 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean onQueryTextChange(String newText) {
                 if (viewPager.getCurrentItem() == 1) {
-                    if (newText.length() > 2) {
-                        if (call != null && call.isExecuted()) {
-                            call.cancel();
+                    if (newText.length() > 3) {
+//                        if (call != null && call.isExecuted()) {
+//                            call.cancel();
+//                        }
+//                        apiSearchByName(newText);
+                        //aqui
+                        if (dbHelper == null)
+                            dbHelper = new DatabaseHelper(MainActivity.this);
+
+                        allCardsList = dbHelper.getSuggestionByName(newText);
+                        for (Card card: allCardsList) {
+                            if (!jsonCardsList.contains(card.getName_en()))
+                                jsonCardsList.add(card.getName_en());
+
+                            if (card.getName_pt() != null && !jsonCardsList.contains(card.getName_pt()))
+                                jsonCardsList.add(card.getName_pt());
                         }
-                        apiSearchByName(newText);
+
+                        setAutoCompleteAdapter();
                     }
                 }
 
@@ -301,47 +329,143 @@ public class MainActivity extends AppCompatActivity {
         fragmentSearch.searchLigaMagic(MainActivity.this, query);
     }
 
+    /**
+     * Retrieves the content of the AllCards.json file and inserts it in table all_cards
+     */
+    private void getAllCardsFromAsset() {
+        String      json;
+        InputStream is;
+        int         size;
+        byte[]      buffer;
+        JSONArray   jsonArray;
+        List<Card>  cardsList;
+
+        try {
+            is     = this.getAssets().open("AllCards.json");
+            size   = is.available();
+            buffer = new byte[size];
+
+            is.read(buffer);
+            is.close();
+            json = new String(buffer, "UTF-8");
+
+            jsonArray = new JSONArray(json);
+            cardsList = new ArrayList<>();
+
+            if (dbHelper == null)
+                dbHelper = new DatabaseHelper(this);
+
+            if (dbHelper.getAllCardsCount() != jsonArray.length()) {
+                dbHelper.deleteAllCards();
+
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject obj = new JSONObject(jsonArray.get(i).toString());
+
+                    Card card = new Card();
+                    if (obj.has("nameEN"))
+                        card.setName_en(obj.getString("nameEN"));
+
+                    if (obj.has("namePT"))
+                        card.setName_pt(obj.getString("namePT"));
+
+                    cardsList.add(card);
+                }
+
+                dbHelper.insertAllCards(cardsList);
+            }
+        } catch (IOException | JSONException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+//    private void getAllCardsFromAPI() {
+//        if (service == null)
+//            service = RetrofitClientInstance.getRetrofitInstance().create(GetDataService.class);
+//
+//        call = service.getAllCards(pageCount);
+//
+//        call.enqueue(new Callback<APICards>() {
+//            @Override
+//            public void onResponse(Call<APICards> call, Response<APICards> response) {
+//                List<APICards> returnedCards = new ArrayList<>();
+//                List<Card>     allCards = new ArrayList<>();
+//                int            cardsQty;
+//                APICards       apiCards;
+//
+//                returnedCards.add(response.body());
+//                apiCards = returnedCards.get(0);
+//                cardsQty = apiCards.getCards().length;
+//
+//                for (int i = 0; i < cardsQty; i++) {
+//                    Card card = new Card();
+//                    card.setName_en(apiCards.getCards()[i].getName());
+//
+//                    for (int y = 0; y < apiCards.getCards()[i].getForeignNames().length; y++) {
+//                        if (apiCards.getCards()[i].getForeignNames()[y].getLanguage().equalsIgnoreCase("Portuguese (Brazil)")) {
+//                            card.setName_pt(apiCards.getCards()[i].getForeignNames()[y].getName());
+//                        }
+//                    }
+//                    allCards.add(card);
+//                }
+//
+//                dbHelper.insertAllCards(allCards);
+//
+//                if (cardsQty == 100) {
+//                    service = null;
+//                    call    = null;
+//                    pageCount++;
+//                    getAllCardsFromAPI();
+//                }
+//            }
+//
+//            @Override
+//            public void onFailure(Call<APICards> call, Throwable t) {
+//                Log.e("getAllCardsFromAPI", t.toString());
+//            }
+//        });
+//    }
+
 
     /**
      * Search a list of cards from the API that have a certain name.
      * @param name
      */
-    private void apiSearchByName(String name) {
-        GetDataService service = RetrofitClientInstance.getRetrofitInstance().create(GetDataService.class);
-        call = service.getCardsByName(name, getString(R.string.pt_br), 10);
-
-        call.enqueue(new Callback<APICards>() {
-            @Override
-            public void onResponse(Call<APICards> call, Response<APICards> response) {
-                List<APICards> returnedCards = new ArrayList<>();
-                jsonCardsList = new ArrayList<>();
-                int cardsQty;
-
-                returnedCards.add(response.body());
-                APICards apiCards = returnedCards.get(0);
-                cardsQty = apiCards.getCards().length;
-
-                for (int i = 0; i < cardsQty; i++) {
-                    for (int y = 0; y < apiCards.getCards()[i].getForeignNames().length; y++) {
-                        if (apiCards.getCards()[i].getForeignNames()[y].getLanguage().equalsIgnoreCase("Portuguese (Brazil)")) {
-                            jsonCardsList.add(apiCards.getCards()[i].getForeignNames()[y].getName());
-                        }
-                    }
-                }
-
-                setAutoCompleteAdapter();
-            }
-
-            @Override
-            public void onFailure(Call<APICards> call, Throwable t) {
-                if (call.isCanceled()) {
-                    Log.e("apiSearchByName","request cancelled");
-                } else {
-                    Log.e("apiSearchByName", t.toString());
-                }
-            }
-        });
-    }
+//    private void apiSearchByName(String name) {
+//        GetDataService service = RetrofitClientInstance.getRetrofitInstance().create(GetDataService.class);
+//        call = service.getCardsByName(name, getString(R.string.pt_br), 10);
+//
+//        call.enqueue(new Callback<APICards>() {
+//            @Override
+//            public void onResponse(Call<APICards> call, Response<APICards> response) {
+//                List<APICards> returnedCards = new ArrayList<>();
+//                jsonCardsList = new ArrayList<>();
+//                int cardsQty;
+//
+//                returnedCards.add(response.body());
+//                APICards apiCards = returnedCards.get(0);
+//                cardsQty = apiCards.getCards().length;
+//
+//                for (int i = 0; i < cardsQty; i++) {
+//                    for (int y = 0; y < apiCards.getCards()[i].getForeignNames().length; y++) {
+//                        if (apiCards.getCards()[i].getForeignNames()[y].getLanguage().equalsIgnoreCase("Portuguese (Brazil)")) {
+//                            jsonCardsList.add(apiCards.getCards()[i].getForeignNames()[y].getName());
+//                        }
+//                    }
+//                }
+//
+//                setAutoCompleteAdapter();
+//            }
+//
+//            @Override
+//            public void onFailure(Call<APICards> call, Throwable t) {
+//                if (call.isCanceled()) {
+//                    Log.e("apiSearchByName","request cancelled");
+//                } else {
+//                    Log.e("apiSearchByName", t.toString());
+//                }
+//            }
+//        });
+//    }
 
     /**
      * Sets the adapter for the autocomplete and shows the dropdown list.
