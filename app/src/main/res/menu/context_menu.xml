@@ -13,8 +13,4 @@
         android:id="@+id/context_menu_add_note"
         android:title="@string/add_note" />
 
-    <item
-        android:id="@+id/context_menu_share"
-        android:title="@string/share"/>
-
 </menu>

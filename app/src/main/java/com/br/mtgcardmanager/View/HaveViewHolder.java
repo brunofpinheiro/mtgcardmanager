@@ -61,7 +61,6 @@ public class HaveViewHolder extends RecyclerView.ViewHolder implements View.OnLo
             menu.add(UNIQUE_FRAGMENT_GROUP_ID, R.id.context_menu_search, 0, R.string.search);
             menu.add(UNIQUE_FRAGMENT_GROUP_ID, R.id.context_menu_delete, 0, R.string.delete);
             menu.add(UNIQUE_FRAGMENT_GROUP_ID, R.id.context_menu_add_note, 0, R.string.add_note);
-            menu.add(UNIQUE_FRAGMENT_GROUP_ID, R.id.context_menu_share, 0, R.string.share);
     }
 
     public void updateCardQty() {

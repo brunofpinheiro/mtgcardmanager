@@ -3,7 +3,6 @@ package com.br.mtgcardmanager.View;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -119,9 +118,6 @@ public class FragmentHave extends Fragment {
                 case R.id.context_menu_add_note:
                     createNotification();
                     return true;
-                case R.id.context_menu_share:
-                    startShareIntent();
-                    return true;
                 default:
                     return super.onContextItemSelected(item);
             }
@@ -172,27 +168,10 @@ public class FragmentHave extends Fragment {
     }
 
     /**
-     * Gets the list to be shared and starts the share intent
-     */
-    private void startShareIntent() {
-        Intent shareIntent;
-        String listToShare;
-
-        shareIntent = new Intent();
-        shareIntent.setAction(Intent.ACTION_SEND);
-
-        listToShare = getListToShare();
-
-        shareIntent.putExtra(Intent.EXTRA_TEXT, listToShare);
-        shareIntent.setType("text/plain");
-        startActivity(shareIntent);
-    }
-
-    /**
      * Returns a string with the quantity and the name of all cards.
      * @return
      */
-    private String getListToShare() {
+    public String getListToShare() {
         String cardsToShare = "";
 
         getHaveCards();

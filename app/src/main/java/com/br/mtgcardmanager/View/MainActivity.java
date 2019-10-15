@@ -60,6 +60,7 @@ public class MainActivity extends AppCompatActivity {
     private              ViewPager                     viewPager;
     private              List<String>                  jsonCardsList = new ArrayList<>();
     private              MenuItem                      searchMenu;
+    private              MenuItem                      shareMenu;
     private              AdView                        mAdView;
     public static        boolean                       running = false;
     private              SearchView.SearchAutoComplete searchAutoComplete;
@@ -74,8 +75,6 @@ public class MainActivity extends AppCompatActivity {
     private static final int                           REQUEST_CODE_UPLOAD_BACKUP = 2;
     private static final int                           REQUEST_CODE_DOWNLOAD_BACKUP = 3;
     private              ProgressDialog                progressDialog;
-    private              int                           pageCount = 1;
-    private              GetDataService                service;
     private              List<Card>                    allCardsList;
 
     @Override
@@ -127,6 +126,13 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 viewPager.setCurrentItem(tab.getPosition());
+                if (tab.getPosition() == 0 || tab.getPosition() == 2) {
+                    if (shareMenu != null)
+                        shareMenu.setVisible(true);
+                } else {
+                    if (shareMenu != null)
+                        shareMenu.setVisible(false);
+                }
             }
 
             @Override
@@ -143,7 +149,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-//        running = true;
         restoreBackup();
     }
 
@@ -155,7 +160,6 @@ public class MainActivity extends AppCompatActivity {
         if (mAdView != null) {
             mAdView.resume();
         }
-//        scheduleAlarm();
     }
 
     @Override
@@ -182,7 +186,6 @@ public class MainActivity extends AppCompatActivity {
             mAdView.destroy();
         }
         running = false;
-//        cancelAlarm();
         super.onDestroy();
     }
 
@@ -196,7 +199,13 @@ public class MainActivity extends AppCompatActivity {
         searchAutoComplete.setTextColor(Color.WHITE);
         searchAutoComplete.setOnItemClickListener((parent, view, position, id) -> {
             String query = (String) parent.getItemAtPosition(position);
-            searchCard(query);
+            if (viewPager.getCurrentItem() == 0) {
+                filterCardList("have", query);
+            } else if (viewPager.getCurrentItem() == 1) {
+                searchCard(query);
+            } else if (viewPager.getCurrentItem() == 2) {
+                filterCardList("want", query);
+            }
         });
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -217,11 +226,6 @@ public class MainActivity extends AppCompatActivity {
             public boolean onQueryTextChange(String newText) {
                 if (viewPager.getCurrentItem() == 1) {
                     if (newText.length() > 3) {
-//                        if (call != null && call.isExecuted()) {
-//                            call.cancel();
-//                        }
-//                        apiSearchByName(newText);
-                        //aqui
                         if (dbHelper == null)
                             dbHelper = new DatabaseHelper(MainActivity.this);
 
@@ -244,6 +248,30 @@ public class MainActivity extends AppCompatActivity {
 
         SearchManager searchManager = (SearchManager) getSystemService(this.SEARCH_SERVICE);
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+
+        shareMenu = menu.findItem(R.id.share);
+        shareMenu.setVisible(false);
+        shareMenu.setOnMenuItemClickListener(menuItem -> {
+            Intent shareIntent;
+            String listToShare = "";
+
+            shareIntent = new Intent();
+            shareIntent.setAction(Intent.ACTION_SEND);
+
+            if (viewPager.getCurrentItem() == 0) {
+                FragmentHave fragmentHave = new FragmentHave();
+                listToShare = fragmentHave.getListToShare();
+            } else if (viewPager.getCurrentItem() == 2) {
+                FragmentWant fragmentWant = new FragmentWant();
+                listToShare = fragmentWant.getListToShare();
+            }
+
+            shareIntent.putExtra(Intent.EXTRA_TEXT, listToShare);
+            shareIntent.setType("text/plain");
+            startActivity(shareIntent);
+
+            return true;
+        });
 
         return true;
     }
