@@ -502,9 +502,13 @@ public class MainActivity extends AppCompatActivity {
      * Restores the data found on Google Drive
      */
     private void restoreBackup() {
-        DatabaseHelper  dbHelper  = new DatabaseHelper(this);
-        ArrayList<Card> haveCards = dbHelper.getAllHaveCards();
-        ArrayList<Card> wantCards = dbHelper.getAllWantCards();
+        DatabaseHelper  dbHelper;
+        ArrayList<Card> haveCards;
+        ArrayList<Card> wantCards;
+
+        dbHelper  = new DatabaseHelper(this);
+        haveCards = dbHelper.getAllHaveCards();
+        wantCards = dbHelper.getAllWantCards();
 
         if (haveCards.size() == 0 && wantCards.size() == 0) {
             requestSignIn();
@@ -530,6 +534,7 @@ public class MainActivity extends AppCompatActivity {
                         driveBackupService.backupFiles(this, progressDialog);
                     }
                 }
+                break;
             case REQUEST_CODE_DOWNLOAD_BACKUP:
                 if (resultCode == Activity.RESULT_OK && resultData != null) {
                     handleSignInResult(resultData);
@@ -537,6 +542,7 @@ public class MainActivity extends AppCompatActivity {
                         driveBackupService.restoreBackup(this);
                     }
                 }
+                break;
         }
     }
 

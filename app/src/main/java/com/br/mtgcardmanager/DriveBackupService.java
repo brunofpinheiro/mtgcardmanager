@@ -10,7 +10,6 @@ import android.widget.Toast;
 
 import com.br.mtgcardmanager.Helper.DatabaseHelper;
 import com.br.mtgcardmanager.Model.Card;
-import com.br.mtgcardmanager.View.MainActivity;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
@@ -39,7 +38,6 @@ public class DriveBackupService {
     private Activity        activity;
     private final Executor  mExecutor = Executors.newSingleThreadExecutor();
     private final Drive     mDriveService;
-    private boolean         backupExists = false;
     private ProgressDialog  progressDialog;
 
     public DriveBackupService(Drive driveService) {
@@ -55,19 +53,19 @@ public class DriveBackupService {
     public void backupFiles(Activity activity, ProgressDialog progressDialog) {
         exportDbToJSON();
 
-        checkIfBackupExists().addOnSuccessListener(res -> {
+        checkIfBackupExists().addOnSuccessListener(backupExists -> {
             if (backupExists) {
-                deleteExistingBackup();
+                deleteExistingBackup().addOnSuccessListener(res -> {
+                    createDriveFile("have");
+                    createDriveFile("want");
+
+                    if (progressDialog != null) {
+                        progressDialog.dismiss();
+                    }
+
+                    Toast.makeText(activity, activity.getString(R.string.backup_completed), Toast.LENGTH_SHORT).show();
+                });
             }
-
-            createDriveFile("have");
-            createDriveFile("want");
-
-            if (progressDialog != null) {
-                progressDialog.dismiss();
-            }
-
-            Toast.makeText(activity, activity.getString(R.string.backup_completed), Toast.LENGTH_SHORT).show();
         });
     }
 
