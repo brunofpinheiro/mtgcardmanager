@@ -66,20 +66,29 @@ public class EditionDAO {
     public Long insertAllEditions(SQLiteDatabase db){
         long edition_id = 0;
 
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_EDITIONS);
-        db.execSQL(DatabaseHelper.CREATE_TABLE_EDITIONS);
-        currentEditions = new ArrayList<>();
-        if (currentEditions.size() == 0) {
-            populateEditionsList();
-        }
+        try {
+            db.execSQL("DROP TABLE IF EXISTS " + TABLE_EDITIONS);
+            db.execSQL(DatabaseHelper.CREATE_TABLE_EDITIONS);
+            currentEditions = new ArrayList<>();
+            if (currentEditions.size() == 0) {
+                populateEditionsList();
+            }
 
-        ContentValues values = new ContentValues();
-        for (int i=0; i < currentEditions.size(); i++){
-            values.put(KEY_EDITION_SHORT, currentEditions.get(i).getEdition_short());
-            values.put(KEY_EDITION, currentEditions.get(i).getEdition());
-            values.put(KEY_EDITION_PT, currentEditions.get(i).getEdition_pt());
-            // insert row
-            edition_id = db.insert(TABLE_EDITIONS, null, values);
+            ContentValues values = new ContentValues();
+            db.beginTransaction();
+            for (int i=0; i < currentEditions.size(); i++){
+                values.put(KEY_EDITION_SHORT, currentEditions.get(i).getEdition_short());
+                values.put(KEY_EDITION, currentEditions.get(i).getEdition());
+                values.put(KEY_EDITION_PT, currentEditions.get(i).getEdition_pt());
+                // insert row
+                edition_id = db.insert(TABLE_EDITIONS, null, values);
+            }
+
+            db.setTransactionSuccessful();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            db.endTransaction();
         }
 
         return edition_id;
