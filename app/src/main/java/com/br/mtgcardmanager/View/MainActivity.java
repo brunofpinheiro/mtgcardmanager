@@ -20,9 +20,7 @@ import android.widget.ArrayAdapter;
 import com.br.mtgcardmanager.Adapter.PagerAdapter;
 import com.br.mtgcardmanager.DriveBackupService;
 import com.br.mtgcardmanager.Helper.DatabaseHelper;
-import com.br.mtgcardmanager.Model.APICards;
 import com.br.mtgcardmanager.Model.Card;
-import com.br.mtgcardmanager.Network.GetDataService;
 import com.br.mtgcardmanager.R;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
@@ -49,13 +47,9 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import retrofit2.Call;
-
-
 
 public class MainActivity extends AppCompatActivity {
 
-    private              FragmentSearch                fragmentSearch;
     private              DatabaseHelper                dbHelper;
     private              ViewPager                     viewPager;
     private              List<String>                  jsonCardsList = new ArrayList<>();
@@ -64,9 +58,6 @@ public class MainActivity extends AppCompatActivity {
     private              AdView                        mAdView;
     public static        boolean                       running = false;
     private              SearchView.SearchAutoComplete searchAutoComplete;
-    private              Call<APICards>                call = null;
-    private              ArrayAdapter<String>          adapter = null;
-    private              SearchView                    searchView = null;
     private              DriveBackupService            driveBackupService;
     private              GoogleSignInClient            client;
     private              GoogleAccountCredential       credential;
@@ -127,9 +118,15 @@ public class MainActivity extends AppCompatActivity {
             public void onTabSelected(TabLayout.Tab tab) {
                 viewPager.setCurrentItem(tab.getPosition());
                 if (tab.getPosition() == 0 || tab.getPosition() == 2) {
+                    if (searchMenu != null)
+                        searchMenu.setIcon(R.drawable.baseline_find_in_page_white_24dp);
+
                     if (shareMenu != null)
                         shareMenu.setVisible(true);
                 } else {
+                    if (searchMenu != null)
+                        searchMenu.setIcon(R.drawable.ic_search_white_24px);
+
                     if (shareMenu != null)
                         shareMenu.setVisible(false);
                 }
@@ -194,7 +191,7 @@ public class MainActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.menu_main, menu);
 
         searchMenu         = menu.findItem(R.id.search);
-        searchView         = (SearchView) MenuItemCompat.getActionView(searchMenu);
+        SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchMenu);
         searchAutoComplete = searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
         searchAutoComplete.setTextColor(Color.WHITE);
         searchAutoComplete.setOnItemClickListener((parent, view, position, id) -> {
@@ -335,7 +332,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void searchCard(String query) {
-        fragmentSearch = new FragmentSearch();
+        FragmentSearch fragmentSearch = new FragmentSearch();
         MenuItemCompat.collapseActionView(searchMenu); //hides the menu search field
         searchAutoComplete.dismissDropDown();
 
@@ -490,7 +487,7 @@ public class MainActivity extends AppCompatActivity {
      * Sets the adapter for the autocomplete and shows the dropdown list.
      */
     private void setAutoCompleteAdapter() {
-        adapter = new ArrayAdapter<>(this, R.layout.auto_complete_dropdown, jsonCardsList);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.auto_complete_dropdown, jsonCardsList);
         searchAutoComplete.setAdapter(adapter);
         searchAutoComplete.showDropDown();
     }
