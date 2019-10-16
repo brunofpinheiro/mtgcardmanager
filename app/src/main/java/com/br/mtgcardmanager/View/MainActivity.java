@@ -321,8 +321,8 @@ public class MainActivity extends AppCompatActivity {
                 if (it.hasNext())
                     current = it.next();
 
-                if (!current.getName_en().toLowerCase().contains(query)
-                        && !current.getName_pt().toLowerCase().contains(query))
+                if (!current.getName_en().toLowerCase().contains(query.toLowerCase())
+                        && !current.getName_pt().toLowerCase().contains(query.toLowerCase()))
                     it.remove();
             }
             fragmentWant.refreshRecyclerView(false);

@@ -72,7 +72,6 @@ public class FragmentSearch extends Fragment implements View.OnClickListener, Ad
     public  String                    selectedEdition;
     public  StringRequest             stringRequest;
     public  View                      fragSearchView;
-    public  UtilsHelper               utils;
 
     public FragmentSearch() {
         // Required empty public constructor
@@ -362,23 +361,22 @@ public class FragmentSearch extends Fragment implements View.OnClickListener, Ad
     }
 
     public void insertCard(String tableName) {
-        utils     = new UtilsHelper();
         dbHelper  = DatabaseHelper.getInstance(this.getContext());
         int       id_edition;
         int       quantity;
         Card      existingCard = new Card();
 
         // Get edition info
-        selectedEdition = utils.padronizeEdition(selectedEdition);
+        selectedEdition = UtilsHelper.padronizeEdition(selectedEdition);
         edition         = dbHelper.getSingleEdition(this.getContext(), selectedEdition);
         id_edition      = edition.getId();
 
         if (id_edition > 0) {
             // If the card already exists update its quantity, else insert a new record
             if (tableName.equalsIgnoreCase("have")) {
-                existingCard = dbHelper.checkIfHaveCardExists(utils.padronizeForSQL(cardNameEN.text()), id_edition, foil);
+                existingCard = dbHelper.checkIfHaveCardExists(UtilsHelper.padronizeForSQL(cardNameEN.text()), id_edition, foil);
             } else if (tableName.equalsIgnoreCase("want")){
-                existingCard = dbHelper.checkIfWantCardExists(utils.padronizeForSQL(cardNameEN.text()), id_edition, foil);
+                existingCard = dbHelper.checkIfWantCardExists(UtilsHelper.padronizeForSQL(cardNameEN.text()), id_edition, foil);
             }
 
             if (existingCard.getQuantity() > 0) {

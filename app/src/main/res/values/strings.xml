@@ -44,6 +44,7 @@
     <string name="backup_found">Encontrei um backup dos seus dados. Deseja restaura-los?</string>
     <string name="backup_in_progress">Backup em andamento…</string>
     <string name="restoring_backup">Restaurando o backup…</string>
+    <string name="quantity_updated">Quantidade alterada</string>
 
     <!--BUTTONS-->
     <string name="btn_have_add">TENHO +1</string>

@@ -1,11 +1,16 @@
 package com.br.mtgcardmanager.Helper;
 
 
-public class UtilsHelper {
-    private String padronized_name;
-    private String padronized_edition;
+import android.app.Activity;
+import android.content.Context;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 
-    public String padronizeForSQL(String card_name){
+public class UtilsHelper {
+
+    public static String padronizeForSQL(String card_name){
+        String padronized_name;
+
         padronized_name = card_name;
 
         if (card_name.contains("'")){
@@ -15,7 +20,9 @@ public class UtilsHelper {
         return padronized_name;
     }
 
-    public String padronizeEdition(String edition){
+    public static String padronizeEdition(String edition){
+        String padronized_edition;
+
         padronized_edition = edition;
 
         if (edition.contains("/")) {
@@ -26,8 +33,8 @@ public class UtilsHelper {
         return padronized_edition;
     }
 
-    public String padronizeCardName(String card_name) {
-        padronized_name = card_name;
+    public static String padronizeCardName(String card_name) {
+        String padronized_name = card_name;
 
         if (card_name.contains("(")) {
             int first_separator  = card_name.lastIndexOf("(") ;
@@ -36,5 +43,10 @@ public class UtilsHelper {
         }
 
         return padronized_name;
+    }
+
+    public static void closeKeyboardFrom(Context context, View view) {
+        InputMethodManager imm = (InputMethodManager) context.getSystemService(Activity.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 }

@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.br.mtgcardmanager.Helper.DatabaseHelper;
 import com.br.mtgcardmanager.Helper.UtilsHelper;
@@ -19,14 +20,14 @@ import com.br.mtgcardmanager.R;
  * Created by Bruno on 21/07/2016.
  */
 public class WantViewHolder extends RecyclerView.ViewHolder implements View.OnLongClickListener, View.OnCreateContextMenuListener {
-    private Context           context;
-    public  TextView          mCardName;
-    public  TextView          mCardEdition;
-    public  EditText          mCardQty;
-    public  TextView          mFoil;
-    final   DatabaseHelper    db_helper;
-    private LongClickListener longClickListener;
-    public  static int        UNIQUE_FRAGMENT_GROUP_ID;
+    private       Context           context;
+    public        TextView          mCardName;
+    public        TextView          mCardEdition;
+    public        EditText          mCardQty;
+    public        TextView          mFoil;
+    private final DatabaseHelper    db_helper;
+    private       LongClickListener longClickListener;
+    private       int               UNIQUE_FRAGMENT_GROUP_ID;
 
     public WantViewHolder(final Context context, View itemView){
         super(itemView);
@@ -44,10 +45,9 @@ public class WantViewHolder extends RecyclerView.ViewHolder implements View.OnLo
         mCardQty.setOnEditorActionListener((v, actionId, event) -> {
             updateCardQty();
             mCardQty.clearFocus();
-            // Closes the virtual keyboard
-            InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
-            imm.hideSoftInputFromWindow(mCardQty.getWindowToken(), 0);
-            return false;
+            UtilsHelper.closeKeyboardFrom(this.context, mCardQty);
+            Toast.makeText(this.context, this.context.getString(R.string.quantity_updated), Toast.LENGTH_SHORT).show();
+            return true;
         });
     }
 
@@ -69,16 +69,16 @@ public class WantViewHolder extends RecyclerView.ViewHolder implements View.OnLo
     }
 
     public void updateCardQty() {
-        UtilsHelper utils = new UtilsHelper();
-        String      edition_name;
-        String      name;
-        int         quantity;
-        int         id_edition;
-        Card        existingCard;
+        String edition_name;
+        String name;
+        int    quantity;
+        int    id_edition;
+        String foil;
+        Card   existingCard;
 
         edition_name = mCardEdition.getText().toString();
         name         = mCardName.getText().toString();
-        String foil  = mFoil.getText().toString().trim();
+        foil  = mFoil.getText().toString().trim();
         quantity     = 0;
 
         if (foil.equals("(Foil)")) {
@@ -87,7 +87,7 @@ public class WantViewHolder extends RecyclerView.ViewHolder implements View.OnLo
             foil = "N";
         }
         id_edition   = db_helper.getSingleEdition(this.context, edition_name).getId();
-        existingCard = db_helper.checkIfWantCardExists(utils.padronizeCardName(name), id_edition, foil);
+        existingCard = db_helper.checkIfWantCardExists(UtilsHelper.padronizeCardName(name), id_edition, foil);
         if (existingCard.getQuantity() > 0) {
             quantity = Integer.parseInt(mCardQty.getText().toString());
         }
