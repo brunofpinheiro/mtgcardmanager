@@ -51,6 +51,7 @@
     <string name="btn_want_add">QUERO +1</string>
     <string name="btn_have_add_4">TENHO +4</string>
     <string name="btn_want_add_4">QUERO +4</string>
+    <string name="btn_vertical_ellipsis">&#8942;</string>
     
     <!--TABLE HEADERS-->
     <string name="header_name">Nome</string>

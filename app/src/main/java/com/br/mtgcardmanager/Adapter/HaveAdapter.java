@@ -10,7 +10,6 @@ import com.br.mtgcardmanager.Model.Card;
 import com.br.mtgcardmanager.View.FragmentHave;
 import com.br.mtgcardmanager.View.HaveViewHolder;
 import com.br.mtgcardmanager.Helper.DatabaseHelper;
-import com.br.mtgcardmanager.LongClickListener;
 import com.br.mtgcardmanager.R;
 
 import java.util.ArrayList;
@@ -41,6 +40,7 @@ public class HaveAdapter extends RecyclerView.Adapter<HaveViewHolder> {
     public void onBindViewHolder (final HaveViewHolder viewHolder, int position) {
         DatabaseHelper dbHelper;
         final Card     card;
+        FragmentHave   fragmentHave;
 
         dbHelper = new DatabaseHelper(context);
         card     = haveCards.get(position);
@@ -56,15 +56,20 @@ public class HaveAdapter extends RecyclerView.Adapter<HaveViewHolder> {
             viewHolder.mFoil.setText(" (" + context.getString(R.string.foil) + ")");
         }
 
-        viewHolder.setLongClickListener(new LongClickListener() {
-            @Override
-            public void onItemLongClick(int position) {
-                FragmentHave fragmentHave;
+        fragmentHave = new FragmentHave();
+        fragmentHave.registerForContextMenu(viewHolder.mBtnMore);
 
-                fragmentHave = new FragmentHave();
-                fragmentHave.getLongPressedItem(card);
-            }
+        viewHolder.mBtnMore.setOnClickListener(view -> viewHolder.mBtnMore.showContextMenu());
+        viewHolder.mBtnMore.setOnCreateContextMenuListener((contextMenu, view1, contextMenuInfo) -> {
+            int UNIQUE_FRAGMENT_GROUP_ID = 1;
+
+            fragmentHave.getClickedItem(card);
+
+            contextMenu.add(UNIQUE_FRAGMENT_GROUP_ID, R.id.context_menu_search, 0, R.string.search);
+            contextMenu.add(UNIQUE_FRAGMENT_GROUP_ID, R.id.context_menu_delete, 0, R.string.delete);
+            contextMenu.add(UNIQUE_FRAGMENT_GROUP_ID, R.id.context_menu_add_note, 0, R.string.add_note);
         });
+
     }
 
     @Override

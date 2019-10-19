@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:paddingTop="2dp"
+    android:paddingTop="5dp"
     android:paddingRight="10dp"
     android:paddingBottom="10dp"
     android:paddingLeft="10dp"
@@ -48,10 +48,21 @@
         android:gravity="end"
         android:textSize="16sp"
         android:layout_alignBottom="@+id/have_card_edition"
-        android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
+        android:layout_marginEnd="20dp"
         android:backgroundTint="@color/textPrimary"
         app:backgroundTint="@color/textPrimary"/>
+
+    <TextView
+        android:id="@+id/have_btn_more"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/btn_vertical_ellipsis"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:textColor="@color/textPrimary"
+        android:paddingHorizontal="5dp"
+        android:textSize="24sp"/>
 
     <View
         android:layout_width="match_parent"

@@ -9,7 +9,6 @@ import android.view.ViewGroup;
 import com.br.mtgcardmanager.Model.Card;
 import com.br.mtgcardmanager.View.FragmentWant;
 import com.br.mtgcardmanager.Helper.DatabaseHelper;
-import com.br.mtgcardmanager.LongClickListener;
 import com.br.mtgcardmanager.R;
 import com.br.mtgcardmanager.View.WantViewHolder;
 
@@ -36,8 +35,12 @@ public class WantAdapter extends RecyclerView.Adapter<WantViewHolder> {
     //Replace the contents of a view (invoked by the layout manager)
     @Override
     public void onBindViewHolder (final WantViewHolder viewHolder, int position) {
-        DatabaseHelper  dbHelper = new DatabaseHelper(context);
-        final Card card = wantCards.get(position);
+        DatabaseHelper dbHelper;
+        final          Card card;
+        FragmentWant   fragmentWant;
+
+        dbHelper = new DatabaseHelper(context);
+        card     = wantCards.get(position);
 
         if (card.getName_en().isEmpty()) {
             viewHolder.mCardName.setText(card.getName_pt());
@@ -50,12 +53,18 @@ public class WantAdapter extends RecyclerView.Adapter<WantViewHolder> {
             viewHolder.mFoil.setText(" (" + context.getString(R.string.foil) + ")");
         }
 
-        viewHolder.setLongClickListener(new LongClickListener() {
-            @Override
-            public void onItemLongClick(int position) {
-                FragmentWant fragmentWant = new FragmentWant();
-                fragmentWant.getLongPressedItem(card);
-            }
+        fragmentWant = new FragmentWant();
+        fragmentWant.registerForContextMenu(viewHolder.mBtnMore);
+
+        viewHolder.mBtnMore.setOnClickListener(view -> viewHolder.mBtnMore.showContextMenu());
+        viewHolder.mBtnMore.setOnCreateContextMenuListener((contextMenu, view1, contextMenuInfo) -> {
+            int UNIQUE_FRAGMENT_GROUP_ID = 2;
+
+            fragmentWant.getClickedItem(card);
+
+            contextMenu.add(UNIQUE_FRAGMENT_GROUP_ID, R.id.context_menu_search, 0, R.string.search);
+            contextMenu.add(UNIQUE_FRAGMENT_GROUP_ID, R.id.context_menu_delete, 0, R.string.delete);
+            contextMenu.add(UNIQUE_FRAGMENT_GROUP_ID, R.id.context_menu_add_note, 0, R.string.add_note);
         });
     }
 

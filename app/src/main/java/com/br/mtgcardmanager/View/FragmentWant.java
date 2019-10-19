@@ -33,16 +33,16 @@ import java.util.ArrayList;
  * A simple {@link Fragment} subclass.
  */
 public class FragmentWant extends Fragment {
-    private static RecyclerView     recyclerView;
-    private static FragmentActivity fragmentActivity;
-    private static TextView         mNoCardsMessage;
-    public         ArrayList<Card>  wantCardsList;
-    public static  int              contextMenuCardId;
-    public static  String           contextMenuNameEn;
-    public static  String           contextMenuNamePt;
-    public static  String           contextMenuFoil;
-    private        int              notificationNumber;
-    private SwipeRefreshLayout      swipeContainer;
+    private static RecyclerView       recyclerView;
+    private static FragmentActivity   fragmentActivity;
+    private static TextView           mNoCardsMessage;
+    public         ArrayList<Card>    wantCardsList;
+    public static  int                contextMenuCardId;
+    public static  String             contextMenuNameEn;
+    public static  String             contextMenuNamePt;
+    public static  String             contextMenuFoil;
+    private        int                notificationNumber;
+    private        SwipeRefreshLayout swipeContainer;
 
 
     public FragmentWant() {
@@ -58,7 +58,6 @@ public class FragmentWant extends Fragment {
         fragmentActivity   = this.getActivity();
         notificationNumber = 0;
 
-        registerForContextMenu(recyclerView);
         refreshRecyclerView(true);
 
         swipeContainer.setOnRefreshListener(() -> {
@@ -87,10 +86,10 @@ public class FragmentWant extends Fragment {
     }
 
     /**
-     * Get the properties of a long pressed item.
+     * Get the properties of a clicked item.
      * @param card
      */
-    public void getLongPressedItem(Card card){
+    public void getClickedItem(Card card) {
         contextMenuCardId = card.getId();
         contextMenuNameEn = card.getName_en();
         contextMenuNamePt = card.getName_pt();

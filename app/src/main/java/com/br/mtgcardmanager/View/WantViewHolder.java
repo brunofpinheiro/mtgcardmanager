@@ -2,16 +2,13 @@ package com.br.mtgcardmanager.View;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
-import android.view.ContextMenu;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.br.mtgcardmanager.Helper.DatabaseHelper;
 import com.br.mtgcardmanager.Helper.UtilsHelper;
-import com.br.mtgcardmanager.LongClickListener;
 import com.br.mtgcardmanager.Model.Card;
 import com.br.mtgcardmanager.R;
 
@@ -19,24 +16,19 @@ import com.br.mtgcardmanager.R;
 /**
  * Created by Bruno on 21/07/2016.
  */
-public class WantViewHolder extends RecyclerView.ViewHolder implements View.OnLongClickListener, View.OnCreateContextMenuListener {
+public class WantViewHolder extends RecyclerView.ViewHolder {
     private       Context           context;
     public        TextView          mCardName;
     public        TextView          mCardEdition;
     public        EditText          mCardQty;
     public        TextView          mFoil;
+    public        TextView          mBtnMore;
     private final DatabaseHelper    db_helper;
-    private       LongClickListener longClickListener;
-    private       int               UNIQUE_FRAGMENT_GROUP_ID;
 
     public WantViewHolder(final Context context, View itemView){
         super(itemView);
-        this.context             = context;
-        db_helper                = DatabaseHelper.getInstance(context);
-        UNIQUE_FRAGMENT_GROUP_ID = 2;
-
-        itemView.setOnLongClickListener(this);
-        itemView.setOnCreateContextMenuListener(this);
+        this.context = context;
+        db_helper    = DatabaseHelper.getInstance(context);
 
         mCardName    = itemView.findViewById(R.id.want_card_name);
         mCardEdition = itemView.findViewById(R.id.want_card_edition);
@@ -49,23 +41,7 @@ public class WantViewHolder extends RecyclerView.ViewHolder implements View.OnLo
             Toast.makeText(this.context, this.context.getString(R.string.quantity_updated), Toast.LENGTH_SHORT).show();
             return true;
         });
-    }
-
-    public void setLongClickListener(LongClickListener listener){
-        this.longClickListener = listener;
-    }
-
-    @Override
-    public boolean onLongClick(View v) {
-        this.longClickListener.onItemLongClick(getLayoutPosition());
-        return false;
-    }
-
-    @Override
-    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-            menu.add(UNIQUE_FRAGMENT_GROUP_ID, R.id.context_menu_search, 0, R.string.search);
-            menu.add(UNIQUE_FRAGMENT_GROUP_ID, R.id.context_menu_delete, 0, R.string.delete);
-            menu.add(UNIQUE_FRAGMENT_GROUP_ID, R.id.context_menu_add_note, 0, R.string.add_note);
+        mBtnMore     = itemView.findViewById(R.id.want_btn_more);
     }
 
     public void updateCardQty() {
