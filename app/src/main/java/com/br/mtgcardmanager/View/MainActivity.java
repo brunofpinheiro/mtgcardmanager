@@ -198,10 +198,13 @@ public class MainActivity extends AppCompatActivity {
             String query = (String) parent.getItemAtPosition(position);
             if (viewPager.getCurrentItem() == 0) {
                 filterCardList("have", query);
+                dismissDropDownMenu();
             } else if (viewPager.getCurrentItem() == 1) {
                 searchCard(query);
+                dismissDropDownMenu();
             } else if (viewPager.getCurrentItem() == 2) {
                 filterCardList("want", query);
+                dismissDropDownMenu();
             }
         });
 
@@ -210,10 +213,13 @@ public class MainActivity extends AppCompatActivity {
             public boolean onQueryTextSubmit(String query) {
                 if (viewPager.getCurrentItem() == 0) {
                     filterCardList("have", query);
+                    dismissDropDownMenu();
                 } else if (viewPager.getCurrentItem() == 1) {
                     searchCard(query);
+                    dismissDropDownMenu();
                 } else if (viewPager.getCurrentItem() == 2) {
                     filterCardList("want", query);
+                    dismissDropDownMenu();
                 }
 
                 return true;
@@ -221,7 +227,12 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                if (viewPager.getCurrentItem() == 1) {
+                if (viewPager.getCurrentItem() == 0) {
+                    if (newText.length() == 0)
+                        filterCardList("have", newText);
+                    else if (newText.length() > 3)
+                        filterCardList("have", newText);
+                } else if (viewPager.getCurrentItem() == 1) {
                     if (newText.length() > 3) {
                         if (dbHelper == null)
                             dbHelper = new DatabaseHelper(MainActivity.this);
@@ -237,6 +248,11 @@ public class MainActivity extends AppCompatActivity {
 
                         setAutoCompleteAdapter();
                     }
+                } else {
+                    if (newText.length() == 0)
+                        filterCardList("want", newText);
+                    else if (newText.length() > 3)
+                        filterCardList("want", newText);
                 }
 
                 return true;
@@ -288,6 +304,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
+     * Closes the dropdown menu
+     */
+    private void dismissDropDownMenu() {
+        MenuItemCompat.collapseActionView(searchMenu); //hides the menu search field
+        searchAutoComplete.dismissDropDown();
+    }
+
+    /**
      * Filters the cards based on what the user typed
      * @param fragmentName
      * @param query
@@ -297,44 +321,46 @@ public class MainActivity extends AppCompatActivity {
             FragmentHave fragmentHave = new FragmentHave();
             fragmentHave.getHaveCards();
 
-            Card current = new Card();
+            if (query.length() > 0) {
+                Card current = new Card();
 
-            for (Iterator<Card> it = fragmentHave.haveCardsList.iterator(); it.hasNext();) {
-                if (it.hasNext())
-                    current = it.next();
+                for (Iterator<Card> it = fragmentHave.haveCardsList.iterator(); it.hasNext();) {
+                    if (it.hasNext())
+                        current = it.next();
 
-                if (!current.getName_en().toLowerCase().contains(query.toLowerCase())
-                        && !current.getName_pt().toLowerCase().contains(query.toLowerCase()))
-                    it.remove();
+                    if (!current.getName_en().toLowerCase().contains(query.toLowerCase())
+                            && !current.getName_pt().toLowerCase().contains(query.toLowerCase()))
+                        it.remove();
+                }
             }
+
             fragmentHave.refreshRecyclerView(false);
+
         } else if (fragmentName.equalsIgnoreCase("want")) {
             FragmentWant fragmentWant = new FragmentWant();
             fragmentWant.getWantCards();
 
-            Card current = new Card();
+            if (query.length() > 0) {
+                Card current = new Card();
 
-            for (Iterator<Card> it = fragmentWant.wantCardsList.iterator(); it.hasNext();) {
-                if (it.hasNext())
-                    current = it.next();
+                for (Iterator<Card> it = fragmentWant.wantCardsList.iterator(); it.hasNext();) {
+                    if (it.hasNext())
+                        current = it.next();
 
-                if (!current.getName_en().toLowerCase().contains(query.toLowerCase())
-                        && !current.getName_pt().toLowerCase().contains(query.toLowerCase()))
-                    it.remove();
+                    if (!current.getName_en().toLowerCase().contains(query.toLowerCase())
+                            && !current.getName_pt().toLowerCase().contains(query.toLowerCase()))
+                        it.remove();
+                }
             }
+
             fragmentWant.refreshRecyclerView(false);
         }
-
-        MenuItemCompat.collapseActionView(searchMenu); //hides the menu search field
-        searchAutoComplete.dismissDropDown();
-
     }
 
 
     public void searchCard(String query) {
         FragmentSearch fragmentSearch = new FragmentSearch();
-        MenuItemCompat.collapseActionView(searchMenu); //hides the menu search field
-        searchAutoComplete.dismissDropDown();
+        dismissDropDownMenu();
 
         // If not in Tab Search, then go to Tab Search
         // 0 = Tab Have / 1 = Tab Search / 2 = Tab Want
