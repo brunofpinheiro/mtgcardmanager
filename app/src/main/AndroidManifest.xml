@@ -18,15 +18,6 @@
         android:largeHeap="true"
         android:usesCleartextTraffic="true">
 
-        <!--<receiver-->
-            <!--android:name=".AlarmReceiver"-->
-            <!--android:process=":remote" />-->
-
-        <!--<service-->
-            <!--android:name=".DriveBackupService"-->
-            <!--android:exported="false"-->
-            <!--android:process=":remote"/>-->
-
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="ca-app-pub-6537002140306514~3136764789"/>

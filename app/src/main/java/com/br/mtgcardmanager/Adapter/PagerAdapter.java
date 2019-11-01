@@ -10,7 +10,7 @@ import com.br.mtgcardmanager.View.FragmentWant;
 
 
 public class PagerAdapter extends FragmentStatePagerAdapter{
-    int                   mNumOfTabs;
+    int mNumOfTabs;
 
 
     public PagerAdapter(FragmentManager fm, int mNumOfTabs) {

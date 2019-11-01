@@ -32,7 +32,7 @@ import java.util.ArrayList;
  * A simple {@link Fragment} subclass.
  */
 public class FragmentHave extends Fragment {
-    private static RecyclerView       recyclerView;
+    private static RecyclerView       mRecyclerView;
     private static FragmentActivity   fragmentActivity;
     private static TextView           mNoCardsMessage;
     public         ArrayList<Card>    haveCardsList;
@@ -41,7 +41,7 @@ public class FragmentHave extends Fragment {
     public  static String             contextMenuNamePt;
     public  static String             contextMenuFoil;
     private        int                notificationNumber;
-    private        SwipeRefreshLayout swipeContainer;
+    private        SwipeRefreshLayout mSwipeContainer;
 
 
     public FragmentHave() {
@@ -51,19 +51,19 @@ public class FragmentHave extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView      = inflater.inflate(R.layout.fragment_have, container, false);
-        recyclerView       = rootView.findViewById(R.id.recycler_view_have);
-        swipeContainer     = rootView.findViewById(R.id.have_swipe_container);
+        mRecyclerView      = rootView.findViewById(R.id.recycler_view_have);
+        mSwipeContainer    = rootView.findViewById(R.id.have_swipe_container);
         mNoCardsMessage    = rootView.findViewById(R.id.no_cards_message);
         fragmentActivity   = this.getActivity();
         notificationNumber = 0;
 
         refreshRecyclerView(true);
 
-        swipeContainer.setOnRefreshListener(() -> {
+        mSwipeContainer.setOnRefreshListener(() -> {
             refreshRecyclerView(false);
-            swipeContainer.setRefreshing(false);
+            mSwipeContainer.setRefreshing(false);
         });
-        swipeContainer.setColorSchemeResources(R.color.colorPrimary,
+        mSwipeContainer.setColorSchemeResources(R.color.colorPrimary,
                 android.R.color.holo_green_light,
                 android.R.color.holo_orange_light,
                 android.R.color.holo_red_light);
@@ -125,7 +125,7 @@ public class FragmentHave extends Fragment {
     }
 
     /**
-     * Creates a notification
+     * Creates a push notification
      */
     private void createNotification() {
         NotificationCompat.Builder builder;
@@ -200,22 +200,22 @@ public class FragmentHave extends Fragment {
 
         // Shows or hides the no cards message
         if (haveCardsList.isEmpty()) {
-            recyclerView.setVisibility(View.GONE);
+            mRecyclerView.setVisibility(View.GONE);
             mNoCardsMessage.setVisibility(View.VISIBLE);
         } else {
-            recyclerView.setVisibility(View.VISIBLE);
+            mRecyclerView.setVisibility(View.VISIBLE);
             mNoCardsMessage.setVisibility(View.GONE);
         }
 
         // Sets up the recycler view with the list of cards
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(fragmentActivity);
-        recyclerView.setLayoutManager(layoutManager);
+        mRecyclerView.setLayoutManager(layoutManager);
 
         haveAdapter = new HaveAdapter(fragmentActivity, haveCardsList);
         haveAdapter.notifyDataSetChanged();
-        recyclerView.invalidate();
-        recyclerView.setAdapter(haveAdapter);
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        mRecyclerView.invalidate();
+        mRecyclerView.setAdapter(haveAdapter);
+        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
     }
 
     /**

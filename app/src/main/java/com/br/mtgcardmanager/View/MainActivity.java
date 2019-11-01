@@ -18,7 +18,7 @@ import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 
 import com.br.mtgcardmanager.Adapter.PagerAdapter;
-import com.br.mtgcardmanager.DriveBackupService;
+import com.br.mtgcardmanager.DriveBackup.DriveBackupService;
 import com.br.mtgcardmanager.Helper.DatabaseHelper;
 import com.br.mtgcardmanager.Model.Card;
 import com.br.mtgcardmanager.R;
@@ -51,7 +51,7 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     private              DatabaseHelper                dbHelper;
-    private              ViewPager                     viewPager;
+    private              ViewPager                     mViewPager;
     private              List<String>                  jsonCardsList = new ArrayList<>();
     private              MenuItem                      searchMenu;
     private              MenuItem                      shareMenu;
@@ -88,8 +88,8 @@ public class MainActivity extends AppCompatActivity {
         // Start loading the ad in the background.
         mAdView.loadAd(adRequest);
 
-        Toolbar toolbar = findViewById(R.id.toolbar_id);
-        setSupportActionBar(toolbar);
+        Toolbar mToolbar = findViewById(R.id.toolbar_id);
+        setSupportActionBar(mToolbar);
 
         // Create or update EDITIONS table
         dbHelper = new DatabaseHelper(this);
@@ -102,21 +102,21 @@ public class MainActivity extends AppCompatActivity {
 
         getAllCardsFromAsset();
 
-        TabLayout tabLayout = findViewById(R.id.tab_layout_id);
-        tabLayout.addTab(tabLayout.newTab().setText(getString(R.string.fragment_have_name)));
-        tabLayout.addTab(tabLayout.newTab().setText(getString(R.string.fragment_search_name)));
-        tabLayout.addTab(tabLayout.newTab().setText(getString(R.string.fragment_want_name)));
-        tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
+        TabLayout mTabLayout = findViewById(R.id.tab_layout_id);
+        mTabLayout.addTab(mTabLayout.newTab().setText(getString(R.string.fragment_have_name)));
+        mTabLayout.addTab(mTabLayout.newTab().setText(getString(R.string.fragment_search_name)));
+        mTabLayout.addTab(mTabLayout.newTab().setText(getString(R.string.fragment_want_name)));
+        mTabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
 
-        viewPager = findViewById(R.id.view_pager_id);
+        mViewPager = findViewById(R.id.view_pager_id);
         final PagerAdapter pagerAdapter = new PagerAdapter
-                (getSupportFragmentManager(), tabLayout.getTabCount());
-        viewPager.setAdapter(pagerAdapter);
-        viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
-        tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+                (getSupportFragmentManager(), mTabLayout.getTabCount());
+        mViewPager.setAdapter(pagerAdapter);
+        mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(mTabLayout));
+        mTabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-                viewPager.setCurrentItem(tab.getPosition());
+                mViewPager.setCurrentItem(tab.getPosition());
                 if (tab.getPosition() == 0 || tab.getPosition() == 2) {
                     if (searchMenu != null)
                         searchMenu.setIcon(R.drawable.baseline_find_in_page_white_24dp);
@@ -140,7 +140,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // Set Tab Search as the initial tab
-        viewPager.setCurrentItem(1);
+        mViewPager.setCurrentItem(1);
     }
 
     @Override
@@ -188,21 +188,23 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        SearchView searchView;
+
         getMenuInflater().inflate(R.menu.menu_main, menu);
 
         searchMenu         = menu.findItem(R.id.search);
-        SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchMenu);
+        searchView         = (SearchView) MenuItemCompat.getActionView(searchMenu);
         searchAutoComplete = searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
         searchAutoComplete.setTextColor(Color.WHITE);
         searchAutoComplete.setOnItemClickListener((parent, view, position, id) -> {
             String query = (String) parent.getItemAtPosition(position);
-            if (viewPager.getCurrentItem() == 0) {
+            if (mViewPager.getCurrentItem() == 0) {
                 filterCardList("have", query);
                 dismissDropDownMenu();
-            } else if (viewPager.getCurrentItem() == 1) {
+            } else if (mViewPager.getCurrentItem() == 1) {
                 searchCard(query);
                 dismissDropDownMenu();
-            } else if (viewPager.getCurrentItem() == 2) {
+            } else if (mViewPager.getCurrentItem() == 2) {
                 filterCardList("want", query);
                 dismissDropDownMenu();
             }
@@ -211,13 +213,13 @@ public class MainActivity extends AppCompatActivity {
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                if (viewPager.getCurrentItem() == 0) {
+                if (mViewPager.getCurrentItem() == 0) {
                     filterCardList("have", query);
                     dismissDropDownMenu();
-                } else if (viewPager.getCurrentItem() == 1) {
+                } else if (mViewPager.getCurrentItem() == 1) {
                     searchCard(query);
                     dismissDropDownMenu();
-                } else if (viewPager.getCurrentItem() == 2) {
+                } else if (mViewPager.getCurrentItem() == 2) {
                     filterCardList("want", query);
                     dismissDropDownMenu();
                 }
@@ -227,12 +229,12 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                if (viewPager.getCurrentItem() == 0) {
+                if (mViewPager.getCurrentItem() == 0) {
                     if (newText.length() == 0)
                         filterCardList("have", newText);
                     else if (newText.length() > 3)
                         filterCardList("have", newText);
-                } else if (viewPager.getCurrentItem() == 1) {
+                } else if (mViewPager.getCurrentItem() == 1) {
                     if (newText.length() > 3) {
                         if (dbHelper == null)
                             dbHelper = new DatabaseHelper(MainActivity.this);
@@ -271,10 +273,10 @@ public class MainActivity extends AppCompatActivity {
             shareIntent = new Intent();
             shareIntent.setAction(Intent.ACTION_SEND);
 
-            if (viewPager.getCurrentItem() == 0) {
+            if (mViewPager.getCurrentItem() == 0) {
                 FragmentHave fragmentHave = new FragmentHave();
                 listToShare = fragmentHave.getListToShare();
-            } else if (viewPager.getCurrentItem() == 2) {
+            } else if (mViewPager.getCurrentItem() == 2) {
                 FragmentWant fragmentWant = new FragmentWant();
                 listToShare = fragmentWant.getListToShare();
             }
@@ -357,15 +359,18 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
+    /**
+     * Searches the card selected on the dropdown
+     * @param query
+     */
     public void searchCard(String query) {
         FragmentSearch fragmentSearch = new FragmentSearch();
         dismissDropDownMenu();
 
         // If not in Tab Search, then go to Tab Search
         // 0 = Tab Have / 1 = Tab Search / 2 = Tab Want
-        if (viewPager.getCurrentItem() != 1) {
-            viewPager.setCurrentItem(1);
+        if (mViewPager.getCurrentItem() != 1) {
+            mViewPager.setCurrentItem(1);
         }
 
         fragmentSearch.searchLigaMagic(MainActivity.this, query);
@@ -468,10 +473,10 @@ public class MainActivity extends AppCompatActivity {
 //    }
 
 
-    /**
-     * Search a list of cards from the API that have a certain name.
-     * @param name
-     */
+//    /**
+//     * Search a list of cards from the API that have a certain name.
+//     * @param name
+//     */
 //    private void apiSearchByName(String name) {
 //        GetDataService service = RetrofitClientInstance.getRetrofitInstance().create(GetDataService.class);
 //        call = service.getCardsByName(name, getString(R.string.pt_br), 10);
@@ -603,9 +608,9 @@ public class MainActivity extends AppCompatActivity {
      */
     private void handleSignInResult(Intent result) {
         GoogleSignInAccount signedInAccount;
+        Drive               googleDriveService;
 
-        credential = GoogleAccountCredential.usingOAuth2(
-                this, Collections.singleton(DriveScopes.DRIVE_FILE));
+        credential = GoogleAccountCredential.usingOAuth2(this, Collections.singleton(DriveScopes.DRIVE_FILE));
 
         signedInAccount = GoogleSignIn.getLastSignedInAccount(this);
         if (signedInAccount != null) {
@@ -618,7 +623,7 @@ public class MainActivity extends AppCompatActivity {
                     .addOnFailureListener(exception -> Log.e(TAG, "Unable to sign in.", exception));
         }
 
-        Drive googleDriveService = new Drive.Builder(
+        googleDriveService = new Drive.Builder(
                 AndroidHttp.newCompatibleTransport(),
                 new GsonFactory(),
                 credential)

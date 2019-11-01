@@ -18,13 +18,17 @@ import static com.br.mtgcardmanager.Helper.DatabaseHelper.KEY_EDITION;
 import static com.br.mtgcardmanager.Helper.DatabaseHelper.KEY_EDITION_PT;
 import static com.br.mtgcardmanager.Helper.DatabaseHelper.KEY_EDITION_SHORT;
 import static com.br.mtgcardmanager.Helper.DatabaseHelper.KEY_ID;
-import static com.br.mtgcardmanager.Helper.DatabaseHelper.KEY_ID_EDITION;
 import static com.br.mtgcardmanager.Helper.DatabaseHelper.LOG;
 import static com.br.mtgcardmanager.Helper.DatabaseHelper.TABLE_EDITIONS;
 
 public class EditionDAO {
     public ArrayList<Edition> currentEditions;
 
+    /**
+     * Returns the total number os editions
+     * @param db
+     * @return
+     */
     public Long getEditionsQty(SQLiteDatabase db){
         SQLiteStatement stmt          = db.compileStatement("SELECT COUNT(*) FROM editions");
         long            editionsCount = stmt.simpleQueryForLong();
@@ -32,6 +36,13 @@ public class EditionDAO {
         return editionsCount;
     }
 
+    /**
+     * Returns a single edition based on its name
+     * @param db
+     * @param context
+     * @param selectedEdition
+     * @return
+     */
     public Edition getSingleEdition(SQLiteDatabase db, Context context, String selectedEdition) {
         Cursor  cursor  = null;
         Edition edition = new Edition();
@@ -42,7 +53,7 @@ public class EditionDAO {
                     + " WHERE " + KEY_EDITION + " LIKE '" + selectedEdition + "' "
                     + " OR " + KEY_EDITION_PT + " LIKE '" + selectedEdition + "' ";
 
-            cursor = db.rawQuery(selectQuery, null);
+            cursor  = db.rawQuery(selectQuery, null);
             edition = new Edition();
 
             if (cursor.getCount() > 0) {
@@ -63,8 +74,14 @@ public class EditionDAO {
         return edition;
     }
 
+    /**
+     * Inserts a list of <Edition>
+     * @param db
+     * @return
+     */
     public Long insertAllEditions(SQLiteDatabase db){
-        long edition_id = 0;
+        long          editionId = 0;
+        ContentValues values;
 
         try {
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_EDITIONS);
@@ -74,14 +91,14 @@ public class EditionDAO {
                 populateEditionsList();
             }
 
-            ContentValues values = new ContentValues();
+            values = new ContentValues();
             db.beginTransaction();
             for (int i=0; i < currentEditions.size(); i++){
                 values.put(KEY_EDITION_SHORT, currentEditions.get(i).getEdition_short());
                 values.put(KEY_EDITION, currentEditions.get(i).getEdition());
                 values.put(KEY_EDITION_PT, currentEditions.get(i).getEdition_pt());
                 // insert row
-                edition_id = db.insert(TABLE_EDITIONS, null, values);
+                editionId = db.insert(TABLE_EDITIONS, null, values);
             }
 
             db.setTransactionSuccessful();
@@ -91,7 +108,7 @@ public class EditionDAO {
             db.endTransaction();
         }
 
-        return edition_id;
+        return editionId;
     }
 
     public ArrayList<Edition> populateEditionsList() {
@@ -295,13 +312,21 @@ public class EditionDAO {
         currentEditions.add(new Edition("MH1", "Modern Horizons", "Modern Horizons"));
 
         // From here forward editions will be ordered by release date
+        currentEditions.add(new Edition("ELD", "Throne of Eldraine", "Trono de Eldraine"));
 
         return currentEditions;
     }
 
+    /**
+     * Searches a edition by id
+     * @param db
+     * @param context
+     * @param edition_id
+     * @return
+     */
     public String getEditionById(SQLiteDatabase db, Context context, long edition_id) {
-        String edition_name = "";
-        Cursor cursor       = null;
+        String editionName = "";
+        Cursor cursor      = null;
 
         try {
             String selectQuery = "SELECT " + KEY_EDITION_PT  + " FROM " + TABLE_EDITIONS
@@ -314,7 +339,7 @@ public class EditionDAO {
                 cursor.moveToFirst();
             }
 
-            edition_name = cursor.getString(cursor.getColumnIndex(KEY_EDITION_PT));
+            editionName = cursor.getString(cursor.getColumnIndex(KEY_EDITION_PT));
         } catch (Exception e) {
             e.printStackTrace();
             Toast.makeText(context, R.string.edition_not_found, Toast.LENGTH_LONG).show();
@@ -323,9 +348,14 @@ public class EditionDAO {
                 cursor.close();
         }
 
-        return edition_name;
+        return editionName;
     }
 
+    /**
+     * Returns a list of all editions
+     * @param db
+     * @return
+     */
     public ArrayList<Edition> getAllEditions(SQLiteDatabase db){
         ArrayList<Edition> editions    = new ArrayList<>();
         String             selectQuery = "";

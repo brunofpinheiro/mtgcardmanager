@@ -43,35 +43,35 @@ import java.util.ArrayList;
  * A simple {@link Fragment} subclass.
  */
 public class FragmentSearch extends Fragment implements View.OnClickListener, AdapterView.OnItemClickListener {
-    private static ArrayList<Edition> cardEditions;
-    private ArrayList<Edition>        availableEditions;
-    private static Elements           cardNamePT;
-    private static Elements           cardNameEN;
-    private Edition                   edition;
-    private String                    foil;
-    public  Boolean                   secondRequest;
-    public  Boolean                   btn_have_pressed;
-    public  Boolean                   btn_have_4_pressed;
-    public  Boolean                   btn_want_pressed;
-    public  Boolean                   btn_want_4_pressed;
-    public  Button                    mButtonHave;
-    public  Button                    mButtonHave4;
-    public  Button                    mButtonWant;
-    public  Button                    mButtonWant4;
-    public  DatabaseHelper            dbHelper;
-    public  Dialog                    dialog;
-    public  Document                  doc;
-    public  Elements                  pageTitle;
-    public  EditionsDialogAdapter     editionsAdapter;
-    public  ListView                  editionsListView;
-    public  ProgressDialog            progressDialog;
-    public  RequestQueue              queue;
-    public  String                    searchedCard;
-    public  String                    url;
-    public  String                    title = "";
-    public  String                    selectedEdition;
-    public  StringRequest             stringRequest;
-    public  View                      fragSearchView;
+    private static ArrayList<Edition>    cardEditions;
+    private        ArrayList<Edition>    availableEditions;
+    private static Elements              cardNamePT;
+    private static Elements              cardNameEN;
+    private        Edition               edition;
+    private        String                foil;
+    public         Boolean               secondRequest;
+    public         Boolean               btnHavePressed;
+    public         Boolean               btnHave4Pressed;
+    public         Boolean               btnWantPressed;
+    public         Boolean               btnWant4Pressed;
+    public         Button                mButtonHave;
+    public         Button                mButtonHave4;
+    public         Button                mButtonWant;
+    public         Button                mButtonWant4;
+    public         DatabaseHelper        dbHelper;
+    public         Dialog                dialog;
+    public         Document              doc;
+    public         Elements              pageTitle;
+    public         EditionsDialogAdapter editionsAdapter;
+    public         ListView              editionsListView;
+    public         ProgressDialog        progressDialog;
+    public         RequestQueue          queue;
+    public         String                searchedCard;
+    public         String                url;
+    public         String                title = "";
+    public         String                selectedEdition;
+    public         StringRequest         stringRequest;
+    public         View                  fragSearchView;
 
     public FragmentSearch() {
         // Required empty public constructor
@@ -87,11 +87,11 @@ public class FragmentSearch extends Fragment implements View.OnClickListener, Ad
         mButtonWant    = fragSearchView.findViewById(R.id.btn_quero);
         mButtonWant4   = fragSearchView.findViewById(R.id.btn_quero_4);
 
-        btn_have_pressed   = false;
-        btn_have_4_pressed = false;
-        btn_want_pressed   = false;
-        btn_want_4_pressed = false;
-        foil               = "N";
+        btnHavePressed  = false;
+        btnHave4Pressed = false;
+        btnWantPressed  = false;
+        btnWant4Pressed = false;
+        foil            = "N";
 
         // set listeners for the buttons
         mButtonHave.setOnClickListener(this);
@@ -103,9 +103,7 @@ public class FragmentSearch extends Fragment implements View.OnClickListener, Ad
     }
 
     /**
-     * recebe a query digitada no campo de busca do menu (searchView), pesquisa a carta e
-     * cria o layout na tela.
-     *
+     * Gets the searched string, searches the card and creates the layout on screen
      * @param activity
      * @param query
      */
@@ -134,8 +132,8 @@ public class FragmentSearch extends Fragment implements View.OnClickListener, Ad
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        doc = Jsoup.parse(response);
-                        title = doc.select("title").toString();
+                        doc           = Jsoup.parse(response);
+                        title         = doc.select("title").toString();
                         secondRequest = false;
                         if (title.contains("Busca:")) {
                             secondRequest = true;
@@ -145,7 +143,7 @@ public class FragmentSearch extends Fragment implements View.OnClickListener, Ad
                                     new Response.Listener<String>() {
                                         @Override
                                         public void onResponse(String response) {
-                                            doc = Jsoup.parse(response);
+                                            doc       = Jsoup.parse(response);
                                             pageTitle = doc.select("title");
                                             // li[id=paginacao-1] indicates that the card was not found
                                             if (doc.select("li[id=paginacao-1]").size() > 0) {
@@ -154,8 +152,7 @@ public class FragmentSearch extends Fragment implements View.OnClickListener, Ad
                                                 if (secondRequest) {
                                                     montarLayout(activity, mCardImage, mCardNamePT, mCardNameEN);
                                                 }
-                                            }
-                                            //end if
+                                            }//end if
                                         }//end onResponse
                                     }, new Response.ErrorListener() {
                                 @Override
@@ -275,7 +272,7 @@ public class FragmentSearch extends Fragment implements View.OnClickListener, Ad
     public void onClick(View view){
         switch (view.getId()){
             case R.id.btn_tenho: {
-                btn_have_pressed = true;
+                btnHavePressed = true;
                 if (cardEditions.size() > 1) {
                     createEditionsDialog();
                 } else {
@@ -285,7 +282,7 @@ public class FragmentSearch extends Fragment implements View.OnClickListener, Ad
                 break;
             }
             case R.id.btn_tenho_4: {
-                btn_have_4_pressed = true;
+                btnHave4Pressed = true;
                 if (cardEditions.size() > 1) {
                     createEditionsDialog();
                 } else {
@@ -295,7 +292,7 @@ public class FragmentSearch extends Fragment implements View.OnClickListener, Ad
                 break;
             }
             case R.id.btn_quero: {
-                btn_want_pressed = true;
+                btnWantPressed = true;
                 if (cardEditions.size() > 1) {
                     createEditionsDialog();
                 } else {
@@ -305,7 +302,7 @@ public class FragmentSearch extends Fragment implements View.OnClickListener, Ad
                 break;
             }
             case R.id.btn_quero_4: {
-                btn_want_4_pressed = true;
+                btnWant4Pressed = true;
                 if (cardEditions.size() > 1) {
                     createEditionsDialog();
                 } else {
@@ -334,14 +331,11 @@ public class FragmentSearch extends Fragment implements View.OnClickListener, Ad
 
         // Checkbox Foil Listener
         CheckBox mFoil = dialog.findViewById(R.id.editions_dialog_foil_checkbox);
-        mFoil.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    foil = "S";
-                } else {
-                    foil = "N";
-                }
+        mFoil.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                foil = "S";
+            } else {
+                foil = "N";
             }
         });
     }
@@ -352,9 +346,9 @@ public class FragmentSearch extends Fragment implements View.OnClickListener, Ad
         selectedEdition = edition.getEdition();
 
         dialog.cancel();
-        if (btn_have_pressed || btn_have_4_pressed) {
+        if (btnHavePressed || btnHave4Pressed) {
             insertCard("have");
-        } else if (btn_want_pressed || btn_want_4_pressed) {
+        } else if (btnWantPressed || btnWant4Pressed) {
             insertCard("want");
         }
 
@@ -362,25 +356,25 @@ public class FragmentSearch extends Fragment implements View.OnClickListener, Ad
 
     public void insertCard(String tableName) {
         dbHelper  = DatabaseHelper.getInstance(this.getContext());
-        int       id_edition;
+        int       idEdition;
         int       quantity;
         Card      existingCard = new Card();
 
         // Get edition info
         selectedEdition = UtilsHelper.padronizeEdition(selectedEdition);
         edition         = dbHelper.getSingleEdition(this.getContext(), selectedEdition);
-        id_edition      = edition.getId();
+        idEdition       = edition.getId();
 
-        if (id_edition > 0) {
+        if (idEdition > 0) {
             // If the card already exists update its quantity, else insert a new record
             if (tableName.equalsIgnoreCase("have")) {
-                existingCard = dbHelper.checkIfHaveCardExists(UtilsHelper.padronizeForSQL(cardNameEN.text()), id_edition, foil);
+                existingCard = dbHelper.checkIfHaveCardExists(UtilsHelper.padronizeForSQL(cardNameEN.text()), idEdition, foil);
             } else if (tableName.equalsIgnoreCase("want")){
-                existingCard = dbHelper.checkIfWantCardExists(UtilsHelper.padronizeForSQL(cardNameEN.text()), id_edition, foil);
+                existingCard = dbHelper.checkIfWantCardExists(UtilsHelper.padronizeForSQL(cardNameEN.text()), idEdition, foil);
             }
 
             if (existingCard.getQuantity() > 0) {
-                if (btn_have_4_pressed || btn_want_4_pressed) {
+                if (btnHave4Pressed || btnWant4Pressed) {
                     quantity = existingCard.getQuantity() + 4;
                 } else {
                     quantity = existingCard.getQuantity() + 1;
@@ -399,7 +393,7 @@ public class FragmentSearch extends Fragment implements View.OnClickListener, Ad
                 newCard.setId_edition(edition.getId());
                 newCard.setFoil(foil);
 
-                if (btn_have_4_pressed || btn_want_4_pressed) {
+                if (btnHave4Pressed || btnWant4Pressed) {
                     quantity = 4;
                     newCard.setQuantity(quantity);
                 } else {
@@ -414,8 +408,8 @@ public class FragmentSearch extends Fragment implements View.OnClickListener, Ad
                 }
             }
 
-            if (dbHelper.card_id != 0) {
-                if (btn_have_4_pressed || btn_want_4_pressed) {
+            if (dbHelper.cardId != 0) {
+                if (btnHave4Pressed || btnWant4Pressed) {
                     Toast.makeText(getActivity().getApplicationContext(), R.string.four_cards_inserted, Toast.LENGTH_SHORT).show();
                 } else {
                     Toast.makeText(getActivity().getApplicationContext(), R.string.one_card_inserted, Toast.LENGTH_SHORT).show();
@@ -434,10 +428,10 @@ public class FragmentSearch extends Fragment implements View.OnClickListener, Ad
                 Toast.makeText(getActivity().getApplicationContext(), R.string.insert_failed, Toast.LENGTH_LONG).show();
             }
 
-            btn_have_pressed   = false;
-            btn_have_4_pressed = false;
-            btn_want_pressed   = false;
-            btn_want_4_pressed = false;
+            btnHavePressed = false;
+            btnHave4Pressed = false;
+            btnWantPressed = false;
+            btnWant4Pressed = false;
             foil               = "N";
         }
     }

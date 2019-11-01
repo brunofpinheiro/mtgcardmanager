@@ -59,22 +59,12 @@
     <string name="header_qty">Qtde</string>
 
     <!--ABOUT ACTIVITY-->
-    <string name="welcome">Bem vindo!</string>
-    <string name="haveandwant">Tenho e Quero</string>
-    <string name="about_description1">"
-        Com o MTG Card Manager você poderá carregar sua coleção com você o tempo todo e facilitar as negociações com outros jogadores!
-
-        Acabou aquela história de deixar de negociar alguma carta porque você não lembra se tem ou deixar de comprar uma carta rara porque você não lembra se ela faz parte do deck que está montando.
-
-        Cadastre as cartas que você tem e as que você quer para levá-las sempre com você e não perca negócios mais!"</string>
-    <string name="about_search_description1">Basta começar a digitar o nome da carta (em inglês) e as sugestões aparecerão.</string>
-    <string name="about_search_description2">Na hora de cadastrar as cartas basta tocar e segurar os botões Tenho ou Quero para adicionar 4 unidades ou um toque simples para adicionar 1 unidade.</string>
-    <string name="about_search_description3">É possível consultar uma carta cadastrada facilmente, deletá-la e até criar um lembrete para ela. Toque e segure uma carta para exibir o menu de ações.</string>
+    <string name="about_description">"Aplicativo criado como trabalho final da ESPECIALIZAÇÃO EM DESENVOLVIMENTO WEB E MOBILE – FULL STACK da UFG (Turma 2018–2019)"</string>
 
     <!-- AdMob -->
     <string name="banner_ad_unit_id">ca-app-pub-6537002140306514/7566964385</string>
     <string name="admob_app_id">ca-app-pub-6537002140306514~3136764789</string>
 
     <!-- OAuth Client ID -->
-    <string name="oauth_id">840519864865-d9gnss84n6rsmacmu18tbe6c7o6sqskd.apps.googleusercontent.com</string>
+    <string name="oauth_id">418973271045-cvf2evorl0stbf3gt7odrekc603o652d.apps.googleusercontent.com</string>
 </resources>

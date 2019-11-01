@@ -18,7 +18,7 @@ public class AboutActivity extends AppCompatActivity {
 
         Toolbar toolbar = findViewById(R.id.toolbar_id);
         setSupportActionBar(toolbar);
-    }//end onCreate
+    }
 
 
     @Override
@@ -29,6 +29,6 @@ public class AboutActivity extends AppCompatActivity {
             finish();
         }
         return false;
-    }//end onKeyDown
+    }
 
-}//end main
+}

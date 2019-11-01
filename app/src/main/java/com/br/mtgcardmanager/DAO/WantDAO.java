@@ -19,10 +19,18 @@ import static com.br.mtgcardmanager.Helper.DatabaseHelper.LOG;
 import static com.br.mtgcardmanager.Helper.DatabaseHelper.TABLE_WANT;
 
 public class WantDAO {
-    public long card_id;
 
+    /**
+     * Inserts a card into table want
+     * @param db
+     * @param card
+     * @return
+     */
     public Long insertWantCard(SQLiteDatabase db, Card card){
-        ContentValues values = new ContentValues();
+        ContentValues values;
+        long          cardId;
+
+        values = new ContentValues();
 
         values.put(KEY_NAME_EN, card.getName_en());
         values.put(KEY_NAME_PT, card.getName_pt());
@@ -31,11 +39,16 @@ public class WantDAO {
         values.put(KEY_FOIL, card.getFoil());
 
         // insert row
-        card_id = db.insert(TABLE_WANT, null, values);
+        cardId = db.insert(TABLE_WANT, null, values);
 
-        return card_id;
+        return cardId;
     }
 
+    /**
+     * Returns a list of all want cards
+     * @param db
+     * @return
+     */
     public ArrayList<Card> getAllWantCards(SQLiteDatabase db){
         ArrayList<Card> cards       = new ArrayList<>();
         String          selectQuery = "";
@@ -63,6 +76,12 @@ public class WantDAO {
         return cards;
     }
 
+    /**
+     * Deletes a want card
+     * @param db
+     * @param id_want_card
+     * @return
+     */
     public int deleteWantCard(SQLiteDatabase db, long id_want_card){
         int rowsAffected;
 
@@ -72,14 +91,29 @@ public class WantDAO {
         return rowsAffected;
     }
 
+    /**
+     * Deletes all want cards
+     * @param db
+     */
     public void deleteAll(SQLiteDatabase db){
         db.delete(TABLE_WANT, null, null);
         db.close();
     }
 
-
+    /**
+     * Checks if a specific card already exists in table want
+     * @param db
+     * @param name_en
+     * @param id_edition
+     * @param foil
+     * @return
+     */
     public Card checkIfWantCardExists(SQLiteDatabase db, String name_en, int id_edition, String foil){
-        String selectQuery = "SELECT *" +
+        String selectQuery;
+        Cursor cursor;
+        Card   existingCard;
+
+        selectQuery = "SELECT *" +
                 " FROM " + TABLE_WANT +
                 " WHERE " + KEY_NAME_EN + " = '" + name_en + "'" +
                 " AND " + KEY_ID_EDITION + " = " + id_edition +
@@ -87,12 +121,12 @@ public class WantDAO {
 
         Log.e(LOG, selectQuery);
 
-        Cursor cursor = db.rawQuery(selectQuery, null);
+        cursor = db.rawQuery(selectQuery, null);
         if (cursor != null){
             cursor.moveToFirst();
         }
 
-        Card existingCard = new Card();
+        existingCard = new Card();
 
         if (cursor.getCount() > 0) {
             existingCard.setId(cursor.getInt(cursor.getColumnIndex(KEY_ID)));

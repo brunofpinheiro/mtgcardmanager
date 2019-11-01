@@ -12,32 +12,34 @@ import com.br.mtgcardmanager.R;
 
 import java.util.List;
 
-/**
- * Created by Bruno on 30/07/2016.
- */
+
 public class EditionsDialogAdapter extends ArrayAdapter<Edition> {
 
-    private int layout_resource;
+    private int layoutResource;
 
     public EditionsDialogAdapter(Context context, int layoutResource, List<Edition> editions) {
         super(context, layoutResource, editions);
-        this.layout_resource = layoutResource;
+        this.layoutResource = layoutResource;
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+        View           view;
+        LayoutInflater layoutInflater;
+        Edition        edition;
+        TextView       mDialogEditionName;
 
-        View view = convertView;
+        view = convertView;
 
         if (view == null) {
-            LayoutInflater layout_inflater = LayoutInflater.from(getContext());
-            view = layout_inflater.inflate(layout_resource, null);
+            layoutInflater = LayoutInflater.from(getContext());
+            view = layoutInflater.inflate(layoutResource, null);
         }
 
-        Edition edition = getItem(position);
+        edition = getItem(position);
 
         if (edition != null) {
-            TextView mDialogEditionName = (TextView) view.findViewById(R.id.dialog_edition_name);
+            mDialogEditionName = view.findViewById(R.id.dialog_edition_name);
             mDialogEditionName.setText(edition.getEdition());
         }
 

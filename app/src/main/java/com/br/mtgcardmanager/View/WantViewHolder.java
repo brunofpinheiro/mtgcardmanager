@@ -21,12 +21,12 @@ public class WantViewHolder extends RecyclerView.ViewHolder {
     public        EditText       mCardQty;
     public        TextView       mFoil;
     public        TextView       mBtnMore;
-    private final DatabaseHelper db_helper;
+    private final DatabaseHelper dbHelper;
 
     public WantViewHolder(final Context context, View itemView){
         super(itemView);
         this.context = context;
-        db_helper    = DatabaseHelper.getInstance(context);
+        dbHelper     = DatabaseHelper.getInstance(context);
 
         mCardName    = itemView.findViewById(R.id.want_card_name);
         mCardEdition = itemView.findViewById(R.id.want_card_edition);
@@ -52,29 +52,29 @@ public class WantViewHolder extends RecyclerView.ViewHolder {
     }
 
     public void updateCardQty() {
-        String edition_name;
+        String editionName;
         String name;
         int    quantity;
-        int    id_edition;
+        int    idEdition;
         String foil;
         Card   existingCard;
 
-        edition_name = mCardEdition.getText().toString();
-        name         = mCardName.getText().toString();
-        foil  = mFoil.getText().toString().trim();
-        quantity     = 0;
+        editionName = mCardEdition.getText().toString();
+        name        = mCardName.getText().toString();
+        foil        = mFoil.getText().toString().trim();
+        quantity    = 0;
 
         if (foil.equals("(Foil)")) {
             foil = "S";
         } else {
             foil = "N";
         }
-        id_edition   = db_helper.getSingleEdition(this.context, edition_name).getId();
-        existingCard = db_helper.checkIfWantCardExists(UtilsHelper.padronizeCardName(name), id_edition, foil);
+        idEdition    = dbHelper.getSingleEdition(this.context, editionName).getId();
+        existingCard = dbHelper.checkIfWantCardExists(UtilsHelper.padronizeCardName(name), idEdition, foil);
         if (existingCard.getQuantity() > 0) {
             quantity = Integer.parseInt(mCardQty.getText().toString());
         }
 
-        db_helper.updateCardQuantity("want", existingCard.getId(), quantity);
+        dbHelper.updateCardQuantity("want", existingCard.getId(), quantity);
     }
 }

@@ -19,9 +19,16 @@ import static com.br.mtgcardmanager.Helper.DatabaseHelper.LOG;
 import static com.br.mtgcardmanager.Helper.DatabaseHelper.TABLE_HAVE;
 
 public class HaveDAO {
-    public long card_id;
 
+    /**
+     * Inserts a card into table have
+     * @param db
+     * @param card
+     * @return
+     */
     public Long insertHaveCard(SQLiteDatabase db, Card card){
+        long cardId;
+
         ContentValues values = new ContentValues();
         values.put(KEY_NAME_EN, card.getName_en());
         values.put(KEY_NAME_PT, card.getName_pt());
@@ -30,11 +37,16 @@ public class HaveDAO {
         values.put(KEY_FOIL, card.getFoil());
 
         // insert row
-        card_id = db.insert(TABLE_HAVE, null, values);
+        cardId = db.insert(TABLE_HAVE, null, values);
 
-        return card_id;
+        return cardId;
     }
 
+    /**
+     * Returns a list of all have cards
+     * @param db
+     * @return
+     */
     public ArrayList<Card> getAllHaveCards(SQLiteDatabase db){
         ArrayList<Card> cards       = new ArrayList<>();
         String          selectQuery = "";
@@ -62,6 +74,12 @@ public class HaveDAO {
         return cards;
     }
 
+    /**
+     * Deletes a have card
+     * @param db
+     * @param id_have_card
+     * @return
+     */
     public int deleteHaveCard(SQLiteDatabase db, long id_have_card){
         int rowsAffected;
 
@@ -71,13 +89,29 @@ public class HaveDAO {
         return rowsAffected;
     }
 
+    /**
+     * Deletes all have cards
+     * @param db
+     */
     public void deleteAll(SQLiteDatabase db){
         db.delete(TABLE_HAVE, null, null);
         db.close();
     }
 
+    /**
+     * Checks if a specific card already exists in table have
+     * @param db
+     * @param name_en
+     * @param id_edition
+     * @param foil
+     * @return
+     */
     public Card checkIfHaveCardExists(SQLiteDatabase db, String name_en, int id_edition, String foil){
-        String selectQuery = "SELECT *" +
+        String selectQuery;
+        Cursor cursor;
+        Card   existingCard;
+
+        selectQuery = "SELECT *" +
                 " FROM " + TABLE_HAVE +
                 " WHERE " + KEY_NAME_EN + " = '" + name_en + "'" +
                 " AND " + KEY_ID_EDITION + " = " + id_edition +
@@ -85,12 +119,12 @@ public class HaveDAO {
 
         Log.e(LOG, selectQuery);
 
-        Cursor cursor = db.rawQuery(selectQuery, null);
+        cursor = db.rawQuery(selectQuery, null);
         if (cursor != null){
             cursor.moveToFirst();
         }
 
-        Card existingCard = new Card();
+        existingCard = new Card();
 
         if (cursor.getCount() > 0) {
             existingCard.setId(cursor.getInt(cursor.getColumnIndex(KEY_ID)));

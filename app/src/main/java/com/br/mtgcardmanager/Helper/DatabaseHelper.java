@@ -21,7 +21,7 @@ import java.util.List;
 public class DatabaseHelper extends SQLiteOpenHelper {
     public               ArrayList<Edition> currentEditions;
     public               long               editionsCount;
-    public               long               card_id;
+    public               long               cardId;
     public  static       SQLiteDatabase     db;
     private static       DatabaseHelper     sInstance;
     public  static final String             LOG = "DatabaseHelper";
@@ -29,23 +29,23 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public  static final String             DATABASE_NAME    = "mtgCardManager";
 
     //Table names
-    public  static  final String             TABLE_HAVE      = "have";
-    public  static  final String             TABLE_WANT      = "want";
-    public  static  final String             TABLE_EDITIONS  = "editions";
-    public  static  final String             TABLE_ALL_CARDS = "all_cards";
+    public  static  final String            TABLE_HAVE      = "have";
+    public  static  final String            TABLE_WANT      = "want";
+    public  static  final String            TABLE_EDITIONS  = "editions";
+    public  static  final String            TABLE_ALL_CARDS = "all_cards";
 
     //Commom column names
-    public  static  final String             KEY_ID            = "id";
-    public  static  final String             KEY_NAME_EN       = "name_en";
-    public  static  final String             KEY_NAME_PT       = "name_pt";
-    public  static  final String             KEY_ID_EDITION    = "id_edition";
-    public  static  final String             KEY_QUANTITY      = "quantity";
-    public  static  final String             KEY_FOIL          = "foil";
+    public  static  final String            KEY_ID            = "id";
+    public  static  final String            KEY_NAME_EN       = "name_en";
+    public  static  final String            KEY_NAME_PT       = "name_pt";
+    public  static  final String            KEY_ID_EDITION    = "id_edition";
+    public  static  final String            KEY_QUANTITY      = "quantity";
+    public  static  final String            KEY_FOIL          = "foil";
 
     //EDITIONS Table - specific column names
-    public  static  final String             KEY_EDITION_SHORT = "edition_short";
-    public  static  final String             KEY_EDITION       = "edition";
-    public  static  final String             KEY_EDITION_PT    = "edition_pt";
+    public  static  final String            KEY_EDITION_SHORT = "edition_short";
+    public  static  final String            KEY_EDITION       = "edition";
+    public  static  final String            KEY_EDITION_PT    = "edition_pt";
 
 
     public DatabaseHelper(Context context) {
@@ -137,9 +137,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db              = this.getWritableDatabase();
         HaveDAO haveDAO = new HaveDAO();
 
-        card_id = haveDAO.insertHaveCard(db, card);
+        cardId = haveDAO.insertHaveCard(db, card);
 
-        return card_id;
+        return cardId;
     }
 
     public ArrayList<Card> getAllHaveCards(){
@@ -178,9 +178,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db              = this.getWritableDatabase();
         WantDAO wantDAO = new WantDAO();
 
-        card_id = wantDAO.insertWantCard(db, card);
+        cardId = wantDAO.insertWantCard(db, card);
 
-        return card_id;
+        return cardId;
     }
 
     public ArrayList<Card> getAllWantCards(){
@@ -224,9 +224,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(KEY_QUANTITY, quantity);
 
         // update card's quantity
-        card_id = db.update(table_name, values, where, null);
+        cardId = db.update(table_name, values, where, null);
 
-        return card_id;
+        return cardId;
     }
 
 

@@ -1,4 +1,4 @@
-package com.br.mtgcardmanager;
+package com.br.mtgcardmanager.DriveBackup;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -10,6 +10,7 @@ import android.widget.Toast;
 
 import com.br.mtgcardmanager.Helper.DatabaseHelper;
 import com.br.mtgcardmanager.Model.Card;
+import com.br.mtgcardmanager.R;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
@@ -31,14 +32,14 @@ import java.util.concurrent.Executors;
 
 
 public class DriveBackupService {
-    private JSONArray       jsonHaveCards;
-    private JSONArray       jsonWantCards;
-    private DatabaseHelper  db_helper;
-    public  GoogleApiClient googleApiClient;
-    private Activity        activity;
-    private final Executor  mExecutor = Executors.newSingleThreadExecutor();
-    private final Drive     mDriveService;
-    private ProgressDialog  progressDialog;
+    private       JSONArray       jsonHaveCards;
+    private       JSONArray       jsonWantCards;
+    private       DatabaseHelper  dbHelper;
+    public        GoogleApiClient googleApiClient;
+    private       Activity        activity;
+    private final Executor        mExecutor = Executors.newSingleThreadExecutor();
+    private final Drive           mDriveService;
+    private       ProgressDialog  progressDialog;
 
     public DriveBackupService(Drive driveService) {
         mDriveService = driveService;
@@ -211,13 +212,13 @@ public class DriveBackupService {
             String         content;
             Gson           gson;
 
-            db_helper  = new DatabaseHelper(activity);
+            dbHelper   = new DatabaseHelper(activity);
             driveFiles = mDriveService.files().list().execute();
 
             if (driveFiles.getFiles().size() > 0) {
                 for (int i = 0; i < driveFiles.getFiles().size(); i++) {
-                    is = mDriveService.files().get(driveFiles.getFiles().get(i).getId()).executeMediaAsInputStream();
-                    reader = new BufferedReader(new InputStreamReader(is));
+                    is            = mDriveService.files().get(driveFiles.getFiles().get(i).getId()).executeMediaAsInputStream();
+                    reader        = new BufferedReader(new InputStreamReader(is));
                     stringBuilder = new StringBuilder();
 
                     while ((line = reader.readLine()) != null) {
@@ -239,7 +240,7 @@ public class DriveBackupService {
                             wantCard.setName_pt(card.getName_pt());
                             wantCard.setQuantity(card.getQuantity());
 
-                            db_helper.insertWantCard(wantCard);
+                            dbHelper.insertWantCard(wantCard);
                         }
                     } else {
                         Card[] haveCards = gson.fromJson(content, Card[].class);
@@ -253,7 +254,7 @@ public class DriveBackupService {
                             haveCard.setName_pt(card.getName_pt());
                             haveCard.setQuantity(card.getQuantity());
 
-                            db_helper.insertHaveCard(haveCard);
+                            dbHelper.insertHaveCard(haveCard);
                         }
                     }
                 }
@@ -275,8 +276,8 @@ public class DriveBackupService {
         int            totalColumn;
         JSONObject     rowObject;
 
-        db_helper   = DatabaseHelper.getInstance(activity);
-        myDataBase  = db_helper.getReadableDatabase();
+        dbHelper    = DatabaseHelper.getInstance(activity);
+        myDataBase  = dbHelper.getReadableDatabase();
         searchQuery = "SELECT  * FROM " + table_name;
         cursor      = myDataBase.rawQuery(searchQuery, null);
 
@@ -304,17 +305,4 @@ public class DriveBackupService {
 
         return jsonArray;
     }
-
-//    private void createNotification() {
-//        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(activity);
-//
-//        mBuilder.setSmallIcon(R.mipmap.ic_notification_white);
-//        mBuilder.setContentTitle(getString(R.string.notification_title));
-//        mBuilder.setContentText(getString(R.string.backup_completed));
-//
-//        NotificationManager mNotificationManager = (NotificationManager)
-//                activity.getSystemService(Context.NOTIFICATION_SERVICE);
-//        notification_number = notification_number + 1;
-//        mNotificationManager.notify(notification_number, mBuilder.build());
-//    }
 }

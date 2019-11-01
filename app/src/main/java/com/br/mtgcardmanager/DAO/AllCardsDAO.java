@@ -17,8 +17,14 @@ import static com.br.mtgcardmanager.Helper.DatabaseHelper.LOG;
 import static com.br.mtgcardmanager.Helper.DatabaseHelper.TABLE_ALL_CARDS;
 
 public class AllCardsDAO {
-    public long card_id;
+    private long cardId;
 
+    /**
+     * Inserts a list of <Card> into table all_cards
+     * @param db
+     * @param allCards
+     * @return
+     */
     public Long insertAll(SQLiteDatabase db, List<Card> allCards){
         ContentValues values;
 
@@ -30,7 +36,7 @@ public class AllCardsDAO {
                 values.put(KEY_NAME_PT, card.getName_pt());
 
                 // insert row
-                card_id = db.insert(TABLE_ALL_CARDS, null, values);
+                cardId = db.insert(TABLE_ALL_CARDS, null, values);
             }
             db.setTransactionSuccessful();
         } catch (Exception e) {
@@ -39,9 +45,14 @@ public class AllCardsDAO {
             db.endTransaction();
         }
 
-        return card_id;
+        return cardId;
     }
 
+    /**
+     * Searches and returns all cards from table all_cards
+     * @param db
+     * @return
+     */
     public ArrayList<Card> getAll(SQLiteDatabase db){
         ArrayList<Card> cards       = new ArrayList<>();
         String          selectQuery = "";
@@ -66,22 +77,21 @@ public class AllCardsDAO {
         return cards;
     }
 
-//    public int deleteHaveCard(SQLiteDatabase db, long id_have_card){
-//        int rowsAffected;
-//
-//        rowsAffected = db.delete(TABLE_HAVE, KEY_ID + " = ?", new String[]{String.valueOf(id_have_card)});
-//        db.close();
-//
-//        return rowsAffected;
-//    }
-//
+    /**
+     * Deletes everything from table all_cards
+     * @param db
+     */
     public void deleteAll(SQLiteDatabase db){
         db.delete(TABLE_ALL_CARDS, null, null);
         db.close();
     }
 
-
-
+    /**
+     * Searches a card by name
+     * @param db
+     * @param name
+     * @return
+     */
     public List<Card> getByName(SQLiteDatabase db, String name) {
         List<Card> cards;
         String     selectQuery;
@@ -111,10 +121,15 @@ public class AllCardsDAO {
         return cards;
     }
 
+    /**
+     * Returns the total number os cards in table all_cards
+     * @param db
+     * @return
+     */
     public int getAllCardsCount(SQLiteDatabase db) {
         String selectQuery;
         Cursor cursor;
-        int count;
+        int    count;
 
         selectQuery = "SELECT count(id) as total" +
                 " FROM " + TABLE_ALL_CARDS;
@@ -132,40 +147,4 @@ public class AllCardsDAO {
 
 
     }
-//
-//    public Card checkIfHaveCardExists(SQLiteDatabase db, String name_en, int id_edition, String foil){
-//        String selectQuery = "SELECT *" +
-//                " FROM " + TABLE_HAVE +
-//                " WHERE " + KEY_NAME_EN + " = '" + name_en + "'" +
-//                " AND " + KEY_ID_EDITION + " = " + id_edition +
-//                " AND " + KEY_FOIL + " = '" + foil + "'";
-//
-//        Log.e(LOG, selectQuery);
-//
-//        Cursor cursor = db.rawQuery(selectQuery, null);
-//        if (cursor != null){
-//            cursor.moveToFirst();
-//        }
-//
-//        Card existingCard = new Card();
-//
-//        if (cursor.getAllCardsCount() > 0) {
-//            existingCard.setId(cursor.getInt(cursor.getColumnIndex(KEY_ID)));
-//            existingCard.setName_en(cursor.getString(cursor.getColumnIndex(KEY_NAME_EN)));
-//            existingCard.setName_pt(cursor.getString(cursor.getColumnIndex(KEY_NAME_PT)));
-//            existingCard.setId_edition(cursor.getInt(cursor.getColumnIndex(KEY_ID_EDITION)));
-//            existingCard.setQuantity(cursor.getInt(cursor.getColumnIndex(KEY_QUANTITY)));
-//            existingCard.setFoil(cursor.getString(cursor.getColumnIndex(KEY_FOIL)));
-//        } else {
-//            existingCard.setId(0);
-//            existingCard.setName_en("");
-//            existingCard.setName_pt("");
-//            existingCard.setId_edition(0);
-//            existingCard.setQuantity(0);
-//            existingCard.setFoil("N");
-//        }
-//
-//        cursor.close();
-//        return existingCard;
-//    }
 }

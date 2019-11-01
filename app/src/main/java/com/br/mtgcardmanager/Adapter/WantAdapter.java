@@ -27,8 +27,11 @@ public class WantAdapter extends RecyclerView.Adapter<WantViewHolder> {
     //Create new views (invoked by the layout manager)
     @Override
     public WantViewHolder onCreateViewHolder(ViewGroup parent, int viewType){
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.recycler_view_want, parent, false);
-        WantViewHolder viewHolder = new WantViewHolder(context, view);
+        View           view;
+        WantViewHolder viewHolder;
+
+        view       = LayoutInflater.from(parent.getContext()).inflate(R.layout.recycler_view_want, parent, false);
+        viewHolder = new WantViewHolder(context, view);
         return viewHolder;
     }
 
@@ -36,7 +39,7 @@ public class WantAdapter extends RecyclerView.Adapter<WantViewHolder> {
     @Override
     public void onBindViewHolder (final WantViewHolder viewHolder, int position) {
         DatabaseHelper dbHelper;
-        final          Card card;
+        final Card     card;
         FragmentWant   fragmentWant;
 
         dbHelper = new DatabaseHelper(context);

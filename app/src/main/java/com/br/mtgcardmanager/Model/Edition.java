@@ -1,8 +1,6 @@
 package com.br.mtgcardmanager.Model;
 
-/**
- * Created by Bruno on 21/07/2016.
- */
+
 public class Edition {
     int    id;
     String edition_short;

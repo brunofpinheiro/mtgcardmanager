@@ -8,43 +8,63 @@ import android.view.inputmethod.InputMethodManager;
 
 public class UtilsHelper {
 
-    public static String padronizeForSQL(String card_name){
-        String padronized_name;
+    /**
+     * Replaces single quotes with double single quotes
+     * @param cardName
+     * @return
+     */
+    public static String padronizeForSQL(String cardName){
+        String padronizedName;
 
-        padronized_name = card_name;
+        padronizedName = cardName;
 
-        if (card_name.contains("'")){
-            padronized_name = card_name.replace("'", "''");
+        if (cardName.contains("'")){
+            padronizedName = cardName.replace("'", "''");
         }
 
-        return padronized_name;
+        return padronizedName;
     }
 
+    /**
+     * If the edition's name contains a slash, returns only what comes after the slash
+     * @param edition
+     * @return
+     */
     public static String padronizeEdition(String edition){
-        String padronized_edition;
+        String padronizedEdition;
 
-        padronized_edition = edition;
+        padronizedEdition = edition;
 
         if (edition.contains("/")) {
-            int name_separator = edition.lastIndexOf("/");
-            padronized_edition = edition.substring(name_separator +1, edition.length()).trim();
+            int nameSeparator = edition.lastIndexOf("/");
+            padronizedEdition = edition.substring(nameSeparator +1, edition.length()).trim();
         }
 
-        return padronized_edition;
+        return padronizedEdition;
     }
 
-    public static String padronizeCardName(String card_name) {
-        String padronized_name = card_name;
+    /**
+     * Removes any parenthesis found on the cards name
+     * @param cardName
+     * @return
+     */
+    public static String padronizeCardName(String cardName) {
+        String padronizedName = cardName;
 
-        if (card_name.contains("(")) {
-            int first_separator  = card_name.lastIndexOf("(") ;
-            int second_separator = card_name.lastIndexOf(")") ;
-            padronized_name      = card_name.substring(first_separator + 1, second_separator).trim();
+        if (cardName.contains("(")) {
+            int firstSeparator  = cardName.lastIndexOf("(") ;
+            int secondSeparator = cardName.lastIndexOf(")") ;
+            padronizedName      = cardName.substring(firstSeparator + 1, secondSeparator).trim();
         }
 
-        return padronized_name;
+        return padronizedName;
     }
 
+    /**
+     * Closes the virtual keyboard
+     * @param context
+     * @param view
+     */
     public static void closeKeyboardFrom(Context context, View view) {
         InputMethodManager imm = (InputMethodManager) context.getSystemService(Activity.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
