@@ -1,3 +1,13 @@
+## MTG Card Manager
+
+Projeto criado para o TCC da Especialização em desenvolvimento web e mobile - full stack da UFG, turma 2018-2019.
+
+Aplicativo desenvolvido em Android nativo, utilizando SQLite como banco de dados, integração com o Google Drive e as bibliotecas Volley, Picaso, Jsoup e Gson.
+
+A ideia desse aplicativo é auxiliar os jogadores/colecionadores de Magic: The Gathering em suas negociações com outros jogadores, assim como facilitar o gerenciamento de suas coleções, de cartas que possuem e de cartas que pretendem adquirir.
+
+O Aplicativo permite que os usuários cadastrem suas coleções de cartas, consultem o preço das cartas, compartilhem suas cartas cadastradas e façam backup dos seus dados.
+
 ## Política de privacidade
 
 ### SEÇÃO 1 – O QUE FAREMOS COM ESTA INFORMAÇÃO?
