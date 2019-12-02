@@ -4,6 +4,8 @@ Projeto criado para o TCC da Especialização em desenvolvimento web e mobile - 
 
 Aplicativo desenvolvido em Android nativo, utilizando SQLite como banco de dados, integração com o Google Drive e as bibliotecas Volley, Picasso, Jsoup e Gson.
 
+Os testes unitários são executados com JUnit e a biblioteca AssertJ, que possibilita escrever as asserções com uma legibilidade maior.
+
 A ideia desse aplicativo é auxiliar os jogadores/colecionadores de Magic: The Gathering em suas negociações com outros jogadores, assim como facilitar o gerenciamento de suas coleções, de cartas que possuem e de cartas que pretendem adquirir.
 
 O Aplicativo permite que os usuários cadastrem suas coleções de cartas, consultem o preço das cartas, compartilhem suas cartas cadastradas e façam backup dos seus dados.
